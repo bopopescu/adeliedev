@@ -1,4 +1,5 @@
 # Django settings for Adelie project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -8,17 +9,28 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'adelieonline',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'taylor123',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+if os.environ['ENVIRONMENT'] == 'testing':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'daeqv2es6ii44t',                      # Or path to database file if using sqlite3.
+            'USER': 'ipewkbsnipaxou',                      # Not used with sqlite3.
+            'PASSWORD': '5_xhoPKB7Ox7wNFC0atpP1a2Tl',                  # Not used with sqlite3.
+            'HOST': 'ec2-23-23-95-222.compute-1.amazonaws.com',                      # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'adelieonline',                      # Or path to database file if using sqlite3.
+            'USER': 'postgres',                      # Not used with sqlite3.
+            'PASSWORD': 'taylor123',                  # Not used with sqlite3.
+            'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        }
+    }
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -104,7 +116,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'adelieproj.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'Adelie.wsgi.application'
+WSGI_APPLICATION = 'adelie.wsgi.application'
 
 TEMPLATE_DIRS = (
     "templates"
@@ -123,6 +135,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'adelieproj',
     'storages',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -155,11 +168,12 @@ LOGGING = {
 }
 
 # Parse database configuration from $DATABASE_URL
-#import dj_database_url
-#DATABASES['default'] =  dj_database_url.config()
+if os.environ['ENVIRONMENT'] == 'testing':
+    import dj_database_url
+    DATABASES['default'] =  dj_database_url.config()
 
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 STATICFILES_STORAGE = DEFAULT_FILE_STORAGE
