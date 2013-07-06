@@ -1,0 +1,37 @@
+from django.conf.urls import patterns, url
+from django.conf import settings
+
+from adelieproj import views
+
+urlpatterns = patterns('',
+    url(r'^$', views.index),
+    url(r'^games/show/(?P<title>.*)$', views.showGame),
+    url(r'^games/(?P<console>.*)$', views.consoleGames),
+    url(r'^games$', views.allGames),
+    url(r'^upcoming$', views.upcomingGames),
+    url(r'^account$', views.myAccount),
+    url(r'^cart$', views.showCart),
+    url(r'^checkout$', views.checkoutPage),
+    url(r'^ajax/checkuser/(?P<username>.*)$', views.checkUser),
+    url(r'^ajax/checkemail/(?P<email>.*)$', views.checkEmail),
+    url(r'^ajax/checkpassword$', views.checkPassword),
+    url(r'^ajax/checkgametitle/(?P<title>.*)$', views.checkGameTitle),
+    url(r'^ajax/addtocart$', views.addToCart),
+    url(r'^ajax/updatecart$', views.updateCart),
+    url(r'^ajax/reguser$', views.regUser),
+    url(r'^ajax/login$', views.login),
+    url(r'^logout$', views.logout),
+    url(r'^admin$', views.admin),
+    url(r'^ajax/savegame$', views.adminSaveGame),
+    url(r'^ajax/editgame$', views.adminEditGame),
+    url(r'^ajax/deletepic$', views.adminDeletePic),
+#    url(r'^ajax/deletevideo$', views.adminDeleteVideo),
+    url(r'^ajax/addtrailer$', views.adminAddTrailer),
+    url(r'^ajax/addconsole$', views.adminAddConsole),
+    url(r'^ajax/editconsole$', views.adminEditConsole),
+    url(r'^admin/showgame/(?P<gameId>\d*)$', views.adminShowGame),
+    url(r'^admin/showcredit/(?P<gameId>\d*)$', views.adminShowCredit),
+    url(r'^ajax/givecredit$', views.adminGiveCredit),
+    url(r'^sign_s3_upload$', views.sign_s3),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+)

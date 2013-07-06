@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/popbox.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/template.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ css }}.css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{{ title }}</title>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="container" id="topBar">
+            <div id="leftTopBar">
+                <h3 id="logo" class="brand">Adelie Online</h3>
+                <h5 id="tagLine">Rewarding the Pre-Order Community</h5>
+            </div>
+            <div id="rightTopBar" class="nav-collapse">
+            <p class="navbar-text pull-right registerLink">
+                {% if user.is_authenticated %}
+                    <span id="welcome">Logged in as {{ user.username.capitalize }}</span> <a  href="/logout">Log out</a>
+                    <div class="fb-like" data-href="https://www.facebook.com/AdelieOnline" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false"></div>
+                {% else %}
+                <div id="notLoggedIn">
+                    <div class='popbox'>
+                        <a class='open signInTab' href='#'>Register</a>
+
+                        <div class='collapses'>
+                            <div class='box'>
+                                <div class='arrow'></div>
+                                <div class='arrowborder'></div>
+                                <div id="regForm">
+                                    <label class="regLabel">Username: 
+                                        <span class="regError" id="userError">Username already exists</span>
+                                        <span class="regError" id="blankUserError">Please enter a username</span>
+                                    </label>
+                                        <input type="text" id="username" />
+                                    
+                                    <label class="regLabel">Email:
+                                        <span class="regError" id="emailError">Email already exists</span>
+                                        <span class="regError" id="blankEmailError">Please enter an email</span>
+                                        <span class="regError" id="validEmailError">Please enter a valid email</span>
+                                    </label>
+                                        <input type="text" id="email" />
+                                        
+                                    <label class="regLabel">Password: 
+                                        <span class="regError" id="passError">Passwords don't match</span>
+                                        <span class="regError" id="blankPassError">Please enter a password</span>
+                                    </label>
+                                        <input type="password" id="pass1" />
+                                    <label class="regLabel">Repeat Password: </label>
+                                        <input type="password" id="pass2" /><br /><br />
+                                    
+                                    <a href="#" class="closepopup">Cancel</a>
+                                    <a href="#" id="register" onclick="register()">Register</a>
+                                </div>
+                                <div id="regSuccess">
+                                    <p id="successP">Thank you for regsitering.<br />You can now log in</p>
+                                    <a href="#" class="closepopup">Close</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='popbox'>
+                        <a class='open signInTab' href='#'>Sign In</a>
+
+                        <div class='collapses'>
+                            <div class='box'>
+                                <div class='arrow'></div>
+                                <div class='arrowborder'></div>
+                                <span class="regError" id="loginError">Incorrect Username or Password</span>
+                                <label class="regLabel">Username: </label>
+                                    <input type="text" id="loginUser" />
+                                <label class="regLabel">Password: </label>
+                                    <input type="password" id="loginPass" /><br /><br />
+                                
+                                <a href="#" class="closepopup">Cancel</a>
+                                <a href="#" id="register" onclick="login()" tabIndex=1>Login</a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="fbButton" class="fb-like" data-href="https://www.facebook.com/AdelieOnline" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false"></div>
+                {% endif %}
+            </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="navbar" id="navigation">
+    <div class="navbar-inner">
+        <div id="navList">
+        <ul class="nav">
+            <li class="{% if page == 'index' %}active{% endif %}"><a href="/">Home</a></li>
+            <li class="{% if page == 'upcoming' %}active{% endif %}"><a href="/upcoming">Upcoming</a></li>
+            <li class="{% if page == 'games' %}active{% endif %}"><a href="/games">Games</a></li>
+            <li class="{% if page == 'news' %}active{% endif %}"><a href="#">News</a></li>
+            <li class="{% if page == 'about' %}active{% endif %}"><a href="#">How It Works</a></li>
+            {% if user.is_authenticated %}
+                <li class="{% if page == 'account' %}active{% endif %}"><a href="/account">My Account</a></li>
+            {% endif %}
+        </ul>
+        </div>
+    </div>
+</div>

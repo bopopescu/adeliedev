@@ -1,0 +1,80 @@
+{% include "header.html" with page="account" css="account" title="Adelie Online" %}
+<div class="container">
+    <div class="row">
+        <div class="span2">
+            <div class="hero-unit" id="leftHolder">
+                <ul id="consoleList">
+                    <li><a href="/account">Account Home</a></li>
+                    <li><a href="/cart">Shopping Cart</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="span10 row" id="rightHolder">
+            <div id="accountTopBar">
+                <div class="floatLeft">
+                    Account Home
+                </div>
+                <div class="floatRight">
+                    ({{ cartLength }}) Shopping Cart
+                </div>
+                <div class="clear"> </div>
+            </div>
+            <div id="accountMidBar">
+                <div class="floatLeft" id="rewardsBox">
+                    <div id="rewardsTitle">Rewards</div>
+                    Reward Dollars Left: {{ rewardsLeft }} <br />
+                    Total Rewards Earned: {{ rewardsTotal }}
+                </div>
+                <div class="floatRight" id="settingsBox">
+                    <div id="settingsTitle">Account Settings</div>
+                    <div id="accountInfo">
+                        Email: {{ user.email }} <br />
+                        Username: {{ user.username }}<br />
+                        Password: ******* <br />
+                        <button id="editInfo" onClick="showAccountEdit();">Edit Account</button>
+                    </div>
+                    <form id="editInfoForm" action="/account" method="POST">
+                        {% csrf_token %}
+                        <span class="error" id="emailBlank">Please enter an email</span>
+                        <span class="error" id="emailTaken">That email is already registered</span>
+                        <span class="error" id="emailValid">Please enter a valid email</span><br />
+                        Email: <input type="text" value="{{ user.email }}" name="email" id="email" /><br />
+                        <span class="error" id="currPassBlank">Please enter your current password</span>
+                        <span class="error" id="currPassWrong">Incorrect Password</span><br />
+                        Current Password: <input type="password" name="currPass" id="currPass" /><br />
+                        <span class="error" id="newPassValid">Please enter a password of at least 8 characters</span><br />
+                        New Password: <input type="password" name="newPass" id="newPass" /><br />
+                        <span class="error" id="confPassDifferent">Password does not match</span><br />
+                        Confirm New Password: <input type="password" name="confPass" id="confPass" /><br />
+                        <input type="submit" value="Edit Information" onClick="return editAccount();"/>
+                    </form>
+                </div>
+            </div>
+            <div id="accountHistoryBar" class="clear">
+                <div id="ordersTitle">Order History</div>
+                <ul id="orderList">
+                    {% for order in orders %}
+                        <li>
+                            <div class="span3 orderInfo">
+                                Ordered: {{ order.created_at|date:"m/d/Y" }}<br />
+                                Ships On: {{ order.game.shipDate|date:"m/d/Y" }}<br />
+                                Receipient: {{ order.shippingAddress.name }}<br />
+                                Price: ${{ order.game.price|floatformat:2 }} <br />
+                                Discount Tier: {{ order.tier }}
+                            </div>
+                            <div class="span2 orderGameInfo">
+                                <img src="{{ order.picture.picture.url }}" width="120px"/>
+                            </div>
+                            <div class="span3">
+                                {{ order.game.title }} <br />
+                                {{ order.console.name }}
+                            </div>
+                            <div class="clear"> </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "footer.html" with js="account" %}

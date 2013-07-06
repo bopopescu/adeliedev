@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/popbox.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/admin.css"/>
+    <title>Adelie</title>
+</head>
+<body>
+<div class="navbar">
+    <div class="navbar-inner">
+        <div class="container" id="topBar">
+            <h3 class="brand">Adelie</h3>
+            <div class="nav-collapse">
+            <p class="navbar-text pull-right registerLink">
+                {% if user.is_authenticated %}
+                    <span id="welcome">Logged in as {{ user.username.capitalize }}</span> <a  href="/logout">Log out</a>
+                {% else %}
+                <div id="notLoggedIn">
+                    <div class='popbox'>
+                        <a class='open signInTab' href='#'>Register</a>
+
+                        <div class='collapses'>
+                            <div class='box'>
+                                <div class='arrow'></div>
+                                <div class='arrowborder'></div>
+                                <div id="regForm">
+                                    <label class="regLabel">Username: 
+                                        <span class="regError" id="userError">Username already exists</span>
+                                        <span class="regError" id="blankUserError">Please enter a username</span>
+                                    </label>
+                                        <input type="text" id="username" />
+                                    
+                                    <label class="regLabel">Email:
+                                        <span class="regError" id="emailError">Email already exists</span>
+                                        <span class="regError" id="blankEmailError">Please enter an email</span>
+                                        <span class="regError" id="validEmailError">Please enter a valid email</span>
+                                    </label>
+                                        <input type="text" id="email" />
+                                        
+                                    <label class="regLabel">Password: 
+                                        <span class="regError" id="passError">Passwords don't match</span>
+                                        <span class="regError" id="blankPassError">Please enter a password</span>
+                                    </label>
+                                        <input type="password" id="pass1" />
+                                    <label class="regLabel">Repeat Password: </label>
+                                        <input type="password" id="pass2" /><br /><br />
+                                    
+                                    <a href="#" class="closepopup">Cancel</a>
+                                    <a href="#" id="register" onclick="register()">Register</a>
+                                </div>
+                                <div id="regSuccess">
+                                    <p id="successP">Thank you for regsitering.<br />You can now log in</p>
+                                    <a href="#" class="closepopup">Close</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='popbox'>
+                        <a class='open signInTab' href='#'>Sign In</a>
+
+                        <div class='collapses'>
+                            <div class='box'>
+                                <div class='arrow'></div>
+                                <div class='arrowborder'></div>
+                                <span class="regError" id="loginError1">Incorrect Username or Password</span>
+                                <label class="regLabel">Username: </label>
+                                    <input type="text" id="loginUser1" />
+                                <label class="regLabel">Password: </label>
+                                    <input type="password" id="loginPass1" /><br /><br />
+                                
+                                <a href="#" class="closepopup">Cancel</a>
+                                <a href="#" id="register" onclick="login(1)" tabIndex=1>Login</a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="span4">
+            <div class="hero-unit" id="leftHolder">
+                <input type="button" value="Add a Game" onClick="window.location = '/admin'" />
+            </div>
+        </div>
+        <div class="span13" id="rightHolder">
+            <h4>{{ game.title }}</h4>
+            <table>
+                <tr><th>User</th><th>Tier</th><th>Credit Given</th></tr>
+                {% for game in games %}
+                    <tr>
+                    <td>{{ game.title }}</td>
+                    <td>{{ game.credited }}</td>
+                    {% if game.credited %}
+                        <td><a href="/admin/showcredit/{{ game.id }}">View Credit</a></td>
+                    {% else %}
+                        <td><button onClick="giveCredit({{ game.id }})">Give Credit</button></td>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<h3>Please go back to the home page. Thank you.</h3>
+{% endif %}
+<script type="text/javascript" src="/static/js/jquery1.9.1.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.js"></script>
+<script type="text/javascript">csrftoken = '{{ csrf_token }}';</script>
+<script type="text/javascript" src='/static/js/popbox.js'></script>
+<script type="text/javascript" src='/static/js/admin.js'></script>
+</body>
+</html>

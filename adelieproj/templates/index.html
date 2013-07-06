@@ -1,0 +1,54 @@
+{% include "header.html" with page="index" css="index" title="Adelie Online" %}
+<div class="container-fluid">
+    <div id="gameRoulette">
+        {% for game in games %}
+            <div class="slide" id="{% cycle 'slide1' 'slide2' 'slide3' 'slide4' 'slide5' %}">
+                <div id="leftSlide" class="span3">
+                    <span class="shipDate">Ships {{ game.shipDate|date:"m/d/Y" }}</span> <br />
+                    <button class="preorderButton" onClick="window.location = '/games/show/{{ game.title }}'">Pre-Order</button><br />
+                    <span class="gameTitle"><h1>{{ game.title }}</h1></span><br />
+                    <span class="tagLine">"{{ game.tagLine }}"</span><br />
+                    <span class="price"><h2>${{ game.price|floatformat:2 }}</h2></span><br />
+                    {% for console in game.consoles.all %}
+                        <span class="console">{{ console.name }}</span>
+                    {% endfor %}
+                </div>
+                <div id="middleSlide" class="span6">
+                    <span class="countdown">{{ game.daysLeft }}:{{ game.hoursLeft }}:{{ game.minutesLeft }}:{{ game.secondsLeft }}</span> <br />
+                        <video width="400" height="200" controls>
+                            <source src="{{ game.trailerUrl }}" type="video/mp4" />
+                            <source src="{{ game.trailerUrl }}" type="video/ogg">
+                            <source src="{{ game.trailerUrl }}" type="video/webm">
+                            <object data="{{ game.trailerUrl }}" width="320" height="240">
+                                <embed src="{{ game.trailerUrl }}" width="320" height="240">
+                            </object> 
+                        </video>
+                    <br />
+                    {% for picture in game.pictures.all %}
+                        <img src="{{ picture.picture.url }}" height="90px" width="75px;" />
+                    {% endfor %}
+                </div>
+                <div id="rightSlide" class="span3">
+                    <span class="desc">{{ game.description }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        <div id="rouletteNumbers">
+            {% for game in games %}
+                <button id="number{% cycle '1' '2' '3' '4' '5' %}" onClick="changeSlide({% cycle '1' '2' '3' '4' '5' %})">{% cycle '1' '2' '3' '4' '5' %}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div id="upcomingGame">
+        {% for game in upcoming %}
+            {% if game.daysLeft == 0 %}
+                {{ game.title }}
+            {% else %}
+                <h1>Next Game Pre-Order Begins In:</h1>
+                {{ game.daysLeft }}:{{ game.hoursLeft }}:{{ game.minutesLeft }}:{{ game.secondsLeft }} <br />
+                <p>Check back 24 hours before launch to find out what awesome game is released! Pre-Order early for greater rewards!</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% include "footer.html" with js="index" %}

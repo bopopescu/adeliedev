@@ -1,0 +1,82 @@
+#gameRoulette {
+    margin-right: auto;
+    margin-left: auto;
+    background-color: black;
+    width: 960px;
+    position: relative;
+    height: 400px;
+}
+
+#rouletteNumbers {
+    margin-right: auto;
+    margin-left: auto;
+    width: 960px;
+    text-align: center;
+    position: relative;
+    top: 400px;
+    background-color: black;
+}
+
+#leftSlide, #middleSlide, #rightSlide {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.slide {
+    height: 400px;
+    position: absolute;
+    top:0px;
+}
+
+.slide span {
+    color: white;
+}
+
+#slide1 {
+    z-index: 5;
+}
+
+#slide2 {
+    z-index: 4;
+}
+
+#slide3 {
+    z-index: 3;
+}
+
+#slide4 {
+    z-index: 2;
+}
+
+#slide5 {
+    z-index: 1;
+}
+
+#slide2, #slide3, #slide4, #slide5 {
+    display: none;
+}
+
+.preorderButton {
+    font-size: 30px;
+    width: 215px;
+    height: 65px;
+}
+
+.console {
+    background-color: white;
+    color: black!important;
+    padding: 2px 12px;
+    padding-right: 10px;
+    border: gray solid 2px;
+}
+
+#upcomingGame {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 960px;
+    margin-top: 50px;
+    text-align: center;
+    color: white;
+    background-color: black;
+}

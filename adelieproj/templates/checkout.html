@@ -1,0 +1,143 @@
+{% include "header.html" with page="account" css="checkout" title="Adelie Online" %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="span4">
+            <div class="hero-unit" id="leftHolder">
+                {% if price == 0 %}
+                    <p>There is nothing in your cart!</p>
+                {% else %}
+                    <label>Order Summary</label>
+                    <table id="gameTable">
+                        <tr><td>Items ({{ items }}):</td><td>${{ price|floatformat:2 }}</td></tr>
+                        <tr><td>Shipping/Handling:</td><td>$0.00</td></tr>
+                        <tr><td>Tax (6.25%):</td><td>${{ tax|floatformat:2 }}</td></tr>
+                        <tr><td>Total Price:</td><td>${{ total|floatformat:2 }}</td></tr>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+        <div class="span13" id="rightHolder">
+            {% for item in cart.items.all %}
+                <div class="gameDiv">
+                    {{ item.game.title }} <br />
+                    ${{ item.game.price|floatformat:2 }} <br />
+                    {{ item.console.name }} <br />
+                    Quantity: {{ item.quantity }} <br />
+                </div>
+            {% endfor %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div id="shippingForm">
+                    <h5>Shipping Address</h5>
+                    <span class="error" id="errorShippingName">Please enter a name</span>
+                    <label>Full Name:</label>
+                        <input type="text" name="shippingName" id="shippingName" />
+                    
+                    <span class="error" id="errorShippingAddress">Please enter an address</span>
+                    <label>Address Line 1:</label>
+                        <input type="text" name="shippingAddressOne" id="shippingAddressOne" />
+                        
+                    <label>Address Line 2:</label>
+                        <input type="text" name="shippingAddressTwo" id="shippingAddressTwo" />
+                    
+                    <span class="error" id="errorShippingCity">Please enter a city</span>
+                    <label>City:</label>
+                        <input type="text" name="shippingCity" id="shippingCity" />
+                    
+                    <span class="error" id="errorShippingState">Please enter a state</span>
+                    <label>State:</label>
+                        <input type="text" name="shippingState" id="shippingState" />
+                    
+                    <span class="error" id="errorShippingZip">Please enter a zip code</span>
+                    <label>Zip Code:</label>
+                        <input type="text" name="shippingZip" id="shippingZip" />
+                </div>
+                <div id="billingContainer">
+                    <h5>Billing Address</h5>
+                    <label>Same as shipping address</label>
+                        <input type="checkbox" name="sameAsShipping" id="sameAsShipping" onChange="toggleBillingAddress()" checked />
+                    <div id="billingForm">
+                        <span class="error" id="errorBillingName">Please enter a name</span>
+                        <label>Full Name:</label>
+                            <input type="text" name="billingName" id="billingName" />
+                        
+                        <span class="error" id="errorBillingAddress">Please enter an address</span>
+                        <label>Address Line 1:</label>
+                            <input type="text" name="billingAddressOne" id="billingAddressOne" />
+                            
+                        <label>Address Line 2:</label>
+                            <input type="text" name="billingAddressTwo" id="billingAddressTwo" />
+                        
+                        <span class="error" id="errorBillingCity">Please enter a city</span>
+                        <label>City:</label>
+                            <input type="text" name="billingCity" id="billingCity" />
+                        
+                        <span class="error" id="errorBillingState">Please enter a state</span>
+                        <label>State:</label>
+                            <input type="text" name="billingState" id="billingState" />
+                        
+                        <span class="error" id="errorBillingZip">Please enter a zip code</span>
+                        <label>Zip Code:</label>
+                            <input type="text" name="billingZip" id="billingZip" />
+                    </div>
+                </div>
+                <div id="paymentInfoDiv">
+                    <h5>Payment Information</h5>
+                    <span class="error" id="errorPaymentName">Please enter a name</span>
+                    <label>Name on Card:</label>
+                        <input type="text" name="paymentName" id="paymentName" />
+                    
+                    <span class="error" id="errorPaymentCard">Please enter a valid card number</span>
+                    <label>Card Number:</label>
+                        <input type="text" name="paymentCard" id="paymentCard" />
+                        
+                    <span class="error" id="errorPaymentDate">Please enter a valid date</span>
+                    <label>Expiration Date:</label>
+                        <select name="paymentMonth" id="paymentMonth">
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select> / 
+                        <select name="paymentYear" id="paymentYear">
+                            <option value="2013">2013</option>
+                            <option value="2014">2014</option>
+                            <option value="2015">2015</option>
+                            <option value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                            <option value="2031">2031</option>
+                            <option value="2032">2032</option>
+                            <option value="2033">2033</option>
+                        </select>
+                        
+                        <span class="error" id="errorPaymentCode">Please enter a valid code</span>
+                        <label>CVC code:</label>
+                            <input type="text" name="paymentCode" id="paymentCode" />
+                </div>
+                <input type="submit" value="Place your order" onClick="return placeYourOrder();" />
+            </form>
+        </div>
+    </div>
+</div>
+{% include "footer.html" with js="checkout" %}
