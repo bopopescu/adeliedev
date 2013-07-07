@@ -1,15 +1,18 @@
 # Django settings for Adelie project.
 import os
-
-DEBUG = True
+ENVIRONMENT = os.environ['ENVIRONMENT']
+if ENVIRONMENT == 'production':
+    DEBUG = False
+else:
+    DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('skier2k5', 'skier2k5@gmail.com'),
 )
 
 MANAGERS = ADMINS
-if os.environ['ENVIRONMENT'] == 'production':
+if ENVIRONMENT == 'production':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -20,7 +23,7 @@ if os.environ['ENVIRONMENT'] == 'production':
             'PORT': '5432',
         }
     }
-elif os.environ['ENVIRONMENT'] == 'testing':
+elif ENVIRONMENT == 'testing':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -50,7 +53,7 @@ else:
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -179,18 +182,21 @@ LOGGING = {
 }
 
 # Parse database configuration from $DATABASE_URL
-if os.environ['ENVIRONMENT'] == 'testing':
+if ENVIRONMENT == 'testing' or ENVIRONMENT == 'production':
     import dj_database_url
     DATABASES['default'] =  dj_database_url.config()
-
-    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 STATICFILES_STORAGE = DEFAULT_FILE_STORAGE
 AWS_ACCESS_KEY_ID = 'AKIAJVFLZNXW6TZZ3USA'
 AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'adelie'
+if ENVIRONMENT == 'production':
+    AWS_STORAGE_BUCKET_NAME = 'adelie'
+elif ENVIRONMENT == 'testing':
+    AWS_STORAGE_BUCKET_NAME = 'adeliestaging'
+else:
+    AWS_STORAGE_BUCKET_NAME = 'adeliedev'
 STATIC_URL = '//s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
