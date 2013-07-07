@@ -2,7 +2,11 @@
 import os
 ENVIRONMENT = os.environ['ENVIRONMENT']
 if ENVIRONMENT == 'production':
-    DEBUG = True
+    DEBUG = False
+    ALLOWED_HOSTS = ['adelie.herokuapp.com']
+elif ENVIRONMENT == 'testing':
+    DEBUG = False
+    ALLOWED_HOSTS = ['adeliestaging.herokuapp.com']
 else:
     DEBUG = True
 TEMPLATE_DEBUG = DEBUG
