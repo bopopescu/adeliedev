@@ -9,26 +9,37 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-if os.environ['ENVIRONMENT'] == 'testing':
+if os.environ['ENVIRONMENT'] == 'production':
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'daeqv2es6ii44t',                      # Or path to database file if using sqlite3.
-            'USER': 'ipewkbsnipaxou',                      # Not used with sqlite3.
-            'PASSWORD': '5_xhoPKB7Ox7wNFC0atpP1a2Tl',                  # Not used with sqlite3.
-            'HOST': 'ec2-23-23-95-222.compute-1.amazonaws.com',                      # Set to empty string for localhost. Not used with sqlite3.
-            'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'd4qkrr8grhgkas',
+            'USER': 'mzlwehagrtajeb',
+            'PASSWORD': 'S7gy1h7k-l_R9SW1So_LFHIAnV',
+            'HOST': 'daeqv2es6ii44t',
+            'PORT': '5432',
+        }
+    }
+elif os.environ['ENVIRONMENT'] == 'testing':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'daeqv2es6ii44t',
+            'USER': 'ipewkbsnipaxou',
+            'PASSWORD': '5_xhoPKB7Ox7wNFC0atpP1a2Tl',
+            'HOST': 'ec2-23-23-95-222.compute-1.amazonaws.com',
+            'PORT': '5432',
         }
     }
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'adelieonline',                      # Or path to database file if using sqlite3.
-            'USER': 'postgres',                      # Not used with sqlite3.
-            'PASSWORD': 'taylor123',                  # Not used with sqlite3.
-            'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'adelieonline',
+            'USER': 'postgres',
+            'PASSWORD': 'taylor123',
+            'HOST': '',
+            'PORT': '',
         }
     }
 
