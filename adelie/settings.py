@@ -2,7 +2,7 @@
 import os
 ENVIRONMENT = os.environ['ENVIRONMENT']
 if ENVIRONMENT == 'production':
-    DEBUG = False
+    DEBUG = True
 else:
     DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -196,7 +196,7 @@ if ENVIRONMENT == 'production':
 elif ENVIRONMENT == 'testing':
     AWS_STORAGE_BUCKET_NAME = 'adeliestaging'
 else:
-    AWS_STORAGE_BUCKET_NAME = 'adeliedev'
+    AWS_STORAGE_BUCKET_NAME = 'adeliedevelopment'
 STATIC_URL = '//s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
