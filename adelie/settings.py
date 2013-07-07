@@ -16,7 +16,7 @@ if os.environ['ENVIRONMENT'] == 'production':
             'NAME': 'd4qkrr8grhgkas',
             'USER': 'mzlwehagrtajeb',
             'PASSWORD': 'S7gy1h7k-l_R9SW1So_LFHIAnV',
-            'HOST': 'daeqv2es6ii44t',
+            'HOST': 'ec2-107-20-201-165.compute-1.amazonaws.com',
             'PORT': '5432',
         }
     }
