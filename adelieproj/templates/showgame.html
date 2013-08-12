@@ -1,21 +1,18 @@
-{% include "header.html" with page="games" css="showgame" title="Adelie Online" %}
+{% include "header.html" with page="products" css="showproduct" title="Adelie Online" %}
 <div class="container">
     <div class="row">
         <div class="span2">
             <div class="hero-unit" id="leftHolder">
                 <ul id="consoleList">
-                    <li><a href="/games">All Games</a></li>
-                    {% for console in consoles %}
-                        <li><a href="/games/{{ console.name }}">{{ console.name }}</a></li>
-                    {% endfor %}
+                    <li><a href="/products">All Products</a></li>
                 </ul>
             </div>
         </div>
         <div class="row" id="rightHolder">
             <div id="showGame">
                 <div class="span4" id="leftSide">
-                    <p><h1>{{ game.title }}</h1></p>
-                    <span id="gameTagLine"> {{ game.tagLine }}</span>
+                    <p><h1>{{ product.name }}</h1></p>
+                    <span id="gameTagLine"> {{ product.tagLine }}</span>
                     <label>Quantity</label>
                     <select id="orderQuantity">
                         <option value="1">1</option>
@@ -24,39 +21,16 @@
                         <option value="4">4</option>
                         <option value="5">5</option>
                     </select>
-                    <label>Console:</label>
-                    <select id="orderConsole">
-                        {% for console in game.consoles.all %}
-                            <option value="{{ console.id }}">{{ console.name }}</option>
-                        {% endfor %}
-                    </select><br />
-                    <button id="placeOrder" onClick="addToCart({{ game.id }})">Add To Cart</button>
-                    
-                    <p>{{ game.publisher }}</p>
+                    <button id="placeOrder" onClick="add_to_cart({{ product.id }})">Add To Cart</button>
+
                     <p>Preorder Sale ends:</p>
-                    <span id="countDown">{{ game.daysLeft }}:{{ game.hoursLeft }}:{{ game.minutesLeft }}:{{ game.secondsLeft }}
-                    <p>{{ game.description }}</p>
+                    <span id="countDown">{{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span
+                    <p>{{ product.description }}</p>
                 </div>
                 <div class="span5" id="rightSide">
-                    <div id="trailers">
-                        <ul id="videoList">
-                        {% for video in game.trailers.all %}
-                            <li>
-                                <video width="320" height="240" controls>
-                                    <source src="{{ video.video.url }}" type="video/mp4">
-                                    <source src="{{ video.video.url }}" type="video/ogg">
-                                    <source src="{{ video.video.url }}" type="video/webm">
-                                    <object data="{{ video.video.url }}" width="320" height="240">
-                                        <embed src="{{ video.video.url }}" width="320" height="240">
-                                    </object> 
-                                </video>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    </div>
                     <div id="pictures">
                         <ul id="pictureList">
-                        {% for pic in game.pictures.all %}
+                        {% for pic in product.pictures.all %}
                             <li>
                                 <img src="{{ pic.picture.url }}" height="120px" width="120px" />
                             </li>
@@ -68,4 +42,4 @@
         </div>
     </div>
 </div>
-{% include "footer.html" with js="showgame" %}
+{% include "footer.html" with js="showproduct" %}

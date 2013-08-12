@@ -89,7 +89,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/app'
+STATIC_ROOT = '/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -192,7 +192,8 @@ if ENVIRONMENT == 'testing' or ENVIRONMENT == 'production':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-STATICFILES_STORAGE = DEFAULT_FILE_STORAGE
+if ENVIRONMENT == 'production' or ENVIRONMENT == 'testing':
+    STATICFILES_STORAGE = DEFAULT_FILE_STORAGE
 AWS_ACCESS_KEY_ID = 'AKIAJVFLZNXW6TZZ3USA'
 AWS_SECRET_ACCESS_KEY = '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'
 if ENVIRONMENT == 'production':
@@ -201,6 +202,7 @@ elif ENVIRONMENT == 'testing':
     AWS_STORAGE_BUCKET_NAME = 'adeliestaging'
 else:
     AWS_STORAGE_BUCKET_NAME = 'adeliedevelopment'
-STATIC_URL = '//s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
-ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+if ENVIRONMENT == 'production' or ENVIRONMENT == 'testing':
+    STATIC_URL = '//s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
+    ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 

@@ -3,176 +3,75 @@ from django.shortcuts import render_to_response, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import auth
 from django.contrib.auth.models import User
-from adelieproj.models import *
-from django.core.context_processors import csrf
+from adelieproj.models import Arrival, TrafficType, ProductArrivalType, ProductView, BillingAddress, CreditCard, ShippingAddress, Picture, Order, Credit, CartItem, Cart, Product
 from django.template import RequestContext
-from .forms import GamePictureForm
-from datetime import datetime
+from .forms import PictureForm
 from django.utils import timezone
-import time, os, json, base64, hmac, sha, math, hashlib
+from datetime import datetime, timedelta, date
 
 authorizedUsers = ["skier2k5", "admin"]
-
-def sign_s3(request):
-    AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY_ID')       
-    AWS_SECRET_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    S3_BUCKET = os.environ.get('S3_BUCKET')
-    object_name = request.POST['gameTitle'].replace(" ", "").replace(":", "") + ".mp4"
-    mime_type = request.POST['type']
-    expires = int(time.time()+10)
-    amz_headers = "x-amz-acl:public-read"
-    put_request = "PUT\n\n%s\n%d\n%s\n/%s/%s" % (mime_type, expires, amz_headers, S3_BUCKET, object_name)
-    signature = base64.encodestring(hmac.new(AWS_SECRET_KEY, put_request, sha).digest())
-    url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, object_name)
-    return HttpResponse(json.dumps({
-        'signed_request': '%s?AWSAccessKeyId=%s&Expires=%d&Signature=%s' % (url, AWS_ACCESS_KEY, expires, signature),
-         'url': url
-      }))
 
 def admin(request):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
-            games = Game.objects.all()
-            consoles = Console.objects.all()
-            return render_to_response("admin.html", RequestContext(request, {'games':games, 'consoles':consoles}))
+            products = Product.objects.all()
+            return render_to_response("admin.html", RequestContext(request, {"products":products}))
     return redirect('/')
-    
-def adminAddConsole(request):
-    if request.user.is_authenticated():
-        if request.user.username in authorizedUsers:
-            if request.method == "POST":
-                consoleName = request.POST['console']
-                if consoleName == "":
-                    return HttpResponse("No name")
-                try:
-                    console = Console.objects.get(name=consoleName)
-                    return HttpResponse("Already Exists")
-                except ObjectDoesNotExist:
-                    console = Console(name = consoleName)
-                    console.save()
-                    return HttpResponse("saved")
-    return HttpResponse("Not Authorized")
-    
-def adminEditConsole(request):
-    if request.user.is_authenticated():
-        if request.user.username in authorizedUsers:
-            if request.method == "POST":
-                consoleId = request.POST['consoleId']
-                consoleName = request.POST['consoleName']
-                if consoleName == "":
-                    return HttpResponse("No Name")
-                try:
-                    console = Console.objects.get(id=consoleId)
-                    console.name = consoleName
-                    console.save()
-                except ObjectDoesNotExist:
-                    return HttpResponse("No Console")
-    
+
+
 def adminGiveCredit(request):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
             if request.method == "POST":
-                try:
-                    gameId = request.POST['gameId']
-                    game = Game.objects.get(id=gameId)
-                    tiers = list()
-                    totalGames = len(game.orders.all())
-                    n = 2
-                    for x in range(1, 11):
-                        tiers.append(math.ceil(totalGames / n))
-                        n *= 2
-                    print tiers
-                    return HttpResponse("gave credit")
-                except ObjectDoesNotExist:
-                    return HttpResponse("no game")
+                return HttpResponse("no game")
     return HttpResponse("go away")
-    
-def adminShowGame(request, gameId):
-    if request.user.is_authenticated():
-        if request.user.username in authorizedUsers:
-            try:
-                game = Game.objects.get(id=gameId)
-                if request.method == 'POST':
-                    form = GamePictureForm(request.POST, request.FILES)
-                    if form.is_valid():
-                        picture = form.save()
-                        game.pictures.add(picture)
-                        return redirect('/admin/showgame/' + gameId)
-                else:
-                    pictureForm = GamePictureForm()
-                    consoles = list(Console.objects.all())
-                    selectedConsoles = list(game.consoles.all())
-                    tempConsoles = consoles
-                    consoles = list()
-                    for c in tempConsoles:
-                        check = False
-                        for sc in selectedConsoles:
-                            if sc.name == c.name:
-                                check = True
-                        if not check:
-                            consoles.append(c)
-                    return render_to_response("adminshowgame.html", RequestContext(request, {"game":game, 
-                                                                                                "pictureForm":pictureForm,
-                                                                                                "consoles":consoles, 
-                                                                                                "selectedconsoles":selectedConsoles}))
-            except ObjectDoesNotExist:
-                return redirect('/admin')
-    return redirect('/')
-    
+
+
 def adminShowCredit(request, gameId):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
-            try:
-                game = Game.objects.get(id=gameId)
-                return render_to_response("adminshowcredit.html", RequestContext(request, {"game":game}))
-            except ObjectDoesNotExist:
-                return redirect('/admin')
-    
-def adminAddTrailer(request):
+            return redirect('/admin')
+
+
+def admin_show_product(request, product_id):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
-            gameId = request.POST.get('gameId', None)
             try:
-                game = Game.objects.get(id=gameId)
+                product = Product.objects.get(id=product_id)
                 if request.method == 'POST':
-                    url = request.POST.get('url', None)
-                    game.trailerUrl = url
-                    game.save()
-                    return HttpResponse('Added')
+                    form = PictureForm(request.POST, request.FILES)
+                    if form.is_valid():
+                        picture = form.save()
+                        product.pictures.add(picture)
+                        return redirect('/admin/showproduct/' + product_id)
+                else:
+                    pictureForm = PictureForm()
+                    return render_to_response("adminshowproduct.html", RequestContext(request, {"product":product,
+                                                                                             "pictureForm":pictureForm,}))
             except ObjectDoesNotExist:
-                return redirect('Not Added')
-            return redirect('Not Added')
-    return HttpResponse("Get Out")
-    
-def adminDeletePic(request):
+                return redirect('/admin')
+    return redirect('/')
+
+
+def admin_delete_pic(request):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
             try:
                 picId = request.POST.get('picId', None)
-                picture = GamePicture.objects.get(id=picId)
+                picture = Picture.objects.get(id=picId)
                 picture.delete()
                 return HttpResponse("Success")
             except ObjectDoesNotExist:
                 return HttpResponse("Failed")
     return HttpResponse("really failed")
 
-#def adminDeleteVideo(request):
-#    if request.user.is_authenticated():
-#        if request.user.username in authorizedUsers:
-#            try:
-#                videoId = request.POST.get('videoId', None)
-#                trailer = GameTrailer.objects.get(id=videoId)
-#                trailer.delete()
-#                return HttpResponse("Success")
-#            except ObjectDoesNotExist:
-#                return HttpResponse("Failed")
-#    return HttpResponse("really failed")
-    
+
 def logout(request):
     auth.logout(request)
     return redirect('/')
 
-def checkEmail(request, email):
+
+def check_email(request, email):
     try:
         user = User.objects.get(email=email)
         if user == request.user:
@@ -182,16 +81,18 @@ def checkEmail(request, email):
     except ObjectDoesNotExist:
         check = False
     return HttpResponse(check)
-    
-def checkUser(request, username):
+
+
+def check_user(request, username):
     try:
-        user = User.objects.get(username=username)
+        User.objects.get(username=username)
         check = True
     except ObjectDoesNotExist:
         check = False
     return HttpResponse(check)
-    
-def checkPassword(request):
+
+
+def check_password(request):
     if request.user.is_authenticated():
         if request.user.check_password(request.POST['password']):
             check = False
@@ -199,16 +100,18 @@ def checkPassword(request):
             check = True
         return HttpResponse(check)
     return HttpResponse("Not Logged In")
-    
-def checkGameTitle(request, title):
+
+
+def check_product_name(request, name):
     try:
-        game = Game.objects.get(title=title)
+        Product.objects.get(name=name)
         check = True
     except ObjectDoesNotExist:
         check = False
     return HttpResponse(check)
-    
-def regUser(request):
+
+
+def reg_user(request):
     if request.is_ajax():
         username = request.POST['username']
         email = request.POST['email']
@@ -226,8 +129,6 @@ def regUser(request):
         except ObjectDoesNotExist:
             pass
         if regUser == True:
-            #send_mail('Thank you for registering at TuftSched.com', 'Thank you for registering.', 
-            #       'TuftSched@TuftSched.com', [email], fail_silently=False)
             user = User.objects.create_user(username, email, pass1)
             user.save()
             return HttpResponse("Success")
@@ -235,13 +136,13 @@ def regUser(request):
             return HttpResponse("Failed")
     else:
         return HttpResponse("Failed")
-        
-def adminSaveGame(request):
+
+
+def admin_save_product(request):
     if request.is_ajax():
         if request.user.is_authenticated():
             if request.user.username in authorizedUsers:
-                title = request.POST['title']
-                publisher = request.POST['publisher']
+                name = request.POST['name']
                 description = request.POST['desc']
                 start = request.POST['start']
                 startTime = request.POST['startTime']
@@ -249,25 +150,19 @@ def adminSaveGame(request):
                 endTime = request.POST['endTime']
                 price = request.POST['price']
                 ship = request.POST['ship']
-                consoles = request.POST.getlist('consoles[]')
                 tagline = request.POST['tagline']
                 saveGame = True
-                if title == "" or publisher == "" or description == "" or start == "" or startTime == ""  or end == "" or endTime == "" or price == "" or price <= 0 or ship == "" or consoles == "" or tagline == "":
+                if name == "" or description == "" or start == "" or startTime == ""  or end == "" or endTime == "" or price == "" or price <= 0 or ship == "" or tagline == "":
                     saveGame = False
                 #if len(description) > 500:
                 #    saveGame = False
                 if len(start) != 10 or len(end) != 10 or len(ship) != 10:
                     saveGame = False
                 try:
-                    game = Game.objects.get(title=title)
+                    Product.objects.get(name=name)
                     saveGame = False
                 except ObjectDoesNotExist:
                     pass
-                try:
-                    for consoleId in consoles:
-                        console = Console.objects.get(id=consoleId)
-                except ObjectDoesNotExist:
-                    saveGame = False
                 if saveGame == True:
                     startYear = start[6:10]
                     startMonth = start[0:2]
@@ -281,13 +176,9 @@ def adminSaveGame(request):
                     start = startYear + "-" + startMonth + "-" + startDay + " " + startTime
                     end = endYear + "-" + endMonth + "-" + endDay + " " + endTime
                     ship = shipYear + "-" + shipMonth + "-" + shipDay
-                    game = Game(title = title, publisher = publisher, description = description, startTime = start, endTime = end, price = price, shipDate = ship, tagLine = tagline)
-                    game.save()
-                    for consoleId in consoles:
-                        console = Console.objects.get(id=consoleId)
-                        game.consoles.add(console)
-                        game.save()
-                    return HttpResponse(game.id)
+                    product = Product(name = name, description = description, startTime = start, endTime = end, price = price, shipDate = ship, tagLine = tagline)
+                    product.save()
+                    return HttpResponse(product.id)
                 else:
                     return HttpResponse("Failed")
             else:
@@ -296,36 +187,32 @@ def adminSaveGame(request):
             return HttpResponse("Failed")
     else:
         return HttpResponse("Failed")
-        
-def adminEditGame(request):
+
+
+def admin_edit_product(request):
     if request.is_ajax():
         if request.user.is_authenticated():
             if request.user.username in authorizedUsers:
-                title = request.POST['title']
-                publisher = request.POST['publisher']
+                name = request.POST['name']
                 description = request.POST['desc']
                 start = request.POST['start']
+                start_time = request.POST['start_time']
                 end = request.POST['end']
+                end_time = request.POST['end_time']
                 price = request.POST['price']
-                gameId = request.POST['gameid']
+                product_id = request.POST['product_id']
                 ship = request.POST['ship']
-                consoles = request.POST.getlist('consoles[]')
                 tagline = request.POST['tagline']
                 saveGame = True
-                if title == "" or publisher == "" or description == "" or start == ""  or end == "" or price == "" or price <= 0 or ship == "" or consoles == "" or tagline == "":
+                if name == "" or description == "" or start == "" or start_time == ""  or end == "" or end_time == "" or price == "" or price <= 0 or ship == "" or tagline == "":
                     saveGame = False
                 #if len(description) > 500:
                 #    saveGame = False
                 if len(start) != 10 or len(end) != 10 or len(ship) != 10:
                     saveGame = False
-                try:
-                    for consoleId in consoles:
-                        console = Console.objects.get(id=consoleId)
-                except ObjectDoesNotExist:
-                    saveGame = False
                 if saveGame == True:
                     try:
-                        game = Game.objects.get(id=gameId)
+                        product = Product.objects.get(id=product_id)
                         startYear = start[6:10]
                         startMonth = start[0:2]
                         startDay = start[3:5]
@@ -335,25 +222,18 @@ def adminEditGame(request):
                         shipYear = ship[6:10]
                         shipMonth = ship[0:2]
                         shipDay = ship[3:5]
-                        start = startYear + "-" + startMonth + "-" + startDay + " 10:00:00"
-                        end = endYear + "-" + endMonth + "-" + endDay + " 10:00:00"
+                        start = startYear + "-" + startMonth + "-" + startDay + " " + start_time
+                        end = endYear + "-" + endMonth + "-" + endDay + " " + end_time
                         ship = shipYear + "-" + shipMonth + "-" + shipDay
-                        game.title = title
-                        game.publisher = publisher
-                        game.description = description
-                        game.startTime = start
-                        game.endTime = end
-                        game.price = price
-                        game.tagLine = tagline
-                        game.shipDate = ship
-                        game.save()
-                        game.consoles.clear()
-                        game.save()
-                        for consoleId in consoles:
-                            console = Console.objects.get(id=consoleId)
-                            game.consoles.add(console)
-                            game.save()
-                        return HttpResponse(game.id)
+                        product.name = name
+                        product.description = description
+                        product.startTime = start
+                        product.endTime = end
+                        product.price = price
+                        product.tagLine = tagline
+                        product.shipDate = ship
+                        product.save()
+                        return HttpResponse(product.id)
                     except ObjectDoesNotExist:
                         pass
                 else:
@@ -364,6 +244,7 @@ def adminEditGame(request):
             return HttpResponse("Failed")
     else:
         return HttpResponse("Failed")
+
 
 def login(request):
     if request.is_ajax():
@@ -378,13 +259,12 @@ def login(request):
                     found = False
                     for item in request.session['cart']:
                         try:
-                            game = Game.objects.get(title=item['game'].title)
-                            console = Console.objects.get(id=item['console'].id)
+                            product = Product.objects.get(name=item['product'].name)
                             for i in cart.items.all():
-                                if game == i.game:
+                                if product == i.product:
                                     found = True
                             if not found:
-                                tempItem = CartItem(game = game, quantity = item['quantity'], user = user, console = console)
+                                tempItem = CartItem(product = product, quantity = item['quantity'], user = user)
                                 tempItem.save()
                                 cart.items.add(tempItem)
                                 cart.save()
@@ -395,9 +275,8 @@ def login(request):
                     cart.save()
                     for item in request.session['cart']:
                         try:
-                            game = Game.objects.get(title=item['game'].title)
-                            console = Console.objects.get(id=item['console'].id)
-                            tempItem = CartItem(game = game, quantity = item['quantity'], user = user, console = console)
+                            product = Product.objects.get(name=item['product'].name)
+                            tempItem = CartItem(product = product, quantity = item['quantity'], user = user)
                             tempItem.save()
                             cart.items.add(tempItem)
                             cart.save()
@@ -406,23 +285,22 @@ def login(request):
             return HttpResponse("Success")
         else:
             return HttpResponse("Failed")
-            
-def addToCart(request):
+
+
+def add_to_cart(request):
     if request.user.is_authenticated():
         quantity = request.POST['quantity']
-        consoleId = request.POST['consoleId']
         if quantity > 0:
             try:
                 cart = Cart.objects.get(user=request.user, checkedOut=False)
                 try:
-                    game = Game.objects.get(id=request.POST['gameId'])
-                    console = Console.objects.get(id=consoleId)
+                    product = Product.objects.get(id=request.POST['product_id'])
                     for item in cart.items.all():
-                        if item.game == game:
+                        if item.product == product:
                             item.quantity = item.quantity + int(quantity)
                             item.save()
                             return HttpResponse("Game existed")
-                    item = CartItem(user = request.user, game = game, quantity = quantity, console = console)
+                    item = CartItem(user = request.user, product = product, quantity = quantity)
                     item.save()
                     cart.items.add(item)
                     return HttpResponse("Added Cart")
@@ -432,9 +310,8 @@ def addToCart(request):
                 cart = Cart(user=request.user)
                 cart.save()
                 try:
-                    game = Game.objects.get(id=request.POST['gameId'])
-                    console = Console.objects.get(id=consoleId)
-                    item = CartItem(user = request.user, game = game, quantity = quantity, console = console)
+                    product = Product.objects.get(id=request.POST['product_id'])
+                    item = CartItem(user = request.user, product = product, quantity = quantity)
                     item.save()
                     cart.items.add(item)
                     return HttpResponse("Create and Add Cart")
@@ -446,34 +323,30 @@ def addToCart(request):
         if request.session.get('cart', False) == False:
             request.session['cart'] = list()
         quantity = request.POST['quantity']
-        consoleId = request.POST['consoleId']
         try:
-            game = Game.objects.get(id=request.POST['gameId'])
-            console = Console.objects.get(id=consoleId)
+            product = Product.objects.get(id=request.POST['product_id'])
             for item in request.session['cart']:
-                if item['game'].title == game.title:
+                if item['product'].name== product.name:
                     item['quantity'] = int(item['quantity']) + int(quantity)
                     request.session.modified = True
                     return HttpResponse("Updated")
             id = len(request.session['cart']) + 1
-            item = {'id': id, 'game': game, 'quantity': quantity, 'console': console}
+            item = {'id': id, 'product': product, 'quantity': quantity}
             request.session['cart'].append(item)
             request.session.modified = True
             return HttpResponse("Session Modified")
         except ObjectDoesNotExist:
             return HttpResponse("No Game")
-        
-def updateCart(request):
+
+
+def update_cart(request):
     if request.user.is_authenticated():
         quantity = request.POST['quantity']
         itemId = request.POST['itemId']
-        consoleId = request.POST['consoleId']
         try:
             item = CartItem.objects.get(user = request.user, id = itemId)
-            console = Console.objects.get(id=consoleId)
             if int(quantity) >= 1:
                 item.quantity = quantity
-                item.console = console
                 item.save()
                 return HttpResponse("Updated")
             else:
@@ -484,24 +357,23 @@ def updateCart(request):
     else:
         quantity = request.POST['quantity']
         itemId = request.POST['itemId']
-        consoleId = request.POST['consoleId']
         try:
-            console = Console.objects.get(id=consoleId)
             if request.session.get('cart', False) == False:
                 return HttpResponse("No Item")
             for item in request.session['cart']:
                 if int(item['id']) == int(itemId):
                     if int(quantity) > 0:
                         item['quantity'] = int(quantity)
-                        item['console'] = console
                     else:
                         request.session['cart'].remove(item)
                 request.session.modified = True
             return HttpResponse("Updated")
         except ObjectDoesNotExist:
             return HttpResponse("No Console")
-        
-def showCart(request):
+
+
+def show_cart(request):
+    current_arrival = track_arrival(request, "unknown")
     if request.user.is_authenticated():
         try:
             cart = Cart.objects.get(user=request.user, checkedOut=False)
@@ -516,7 +388,9 @@ def showCart(request):
             request.session.modified = True
         return render_to_response("showcart.html", RequestContext(request, {"cart":request.session['cart']}))
 
-def checkoutPage(request):
+
+def checkout_page(request):
+    current_arrival = track_arrival(request, "unknown")
     if request.user.is_authenticated():
         if request.method == 'POST':
             try:
@@ -561,9 +435,9 @@ def checkoutPage(request):
                     payment.save()
                     for item in cart.items.all():
                         for x in range(0, int(item.quantity)):
-                            gameOrder = GameOrder(user=request.user, creditCard=payment, shippingAddress=shipping, billingAddress=billing, console=item.console)
-                            gameOrder.save()
-                            item.game.orders.add(gameOrder)
+                            order = Order(user=request.user, creditCard=payment, shippingAddress=shipping, billingAddress=billing)
+                            order.save()
+                            item.product.orders.add(order)
                     return redirect('/')
                 else:
                     return redirect('/')
@@ -580,46 +454,52 @@ def checkoutPage(request):
             items = 0
             for item in cart.items.all():
                 items += int(item.quantity)
-                price += float(item.game.price) * float(item.quantity)
+                price += float(item.product.price) * float(item.quantity)
             tax = price * .0625
             total = price + tax
-            return render_to_response("checkout.html", RequestContext(request, {'cart':cart, 'price': price, 'tax': tax, 'total':total, 'items':items}))
+            cart_length = len(cart.items.all())
+            return render_to_response("checkout.html", RequestContext(request, {'cart_length': cart_length, 'cart':cart, 'price': price, 'tax': tax, 'total':total, 'items':items}))
     else:
         return HttpResponse("Make a login page")
 
-def showGame(request, title):
+
+def show_product(request, name):
     try:
-        game = Game.objects.get(title=title)
-        countdown = game.endTime.astimezone(timezone.utc).replace(tzinfo=None) - datetime.now()
-        if countdown.days >= 0:
-            game.daysLeft = countdown.days
-            game.hoursLeft = countdown.seconds / 3600
-            game.minutesLeft = (countdown.seconds - (game.hoursLeft * 3600)) / 60
-            game.secondsLeft = (countdown.seconds - (game.hoursLeft * 3600)) - (game.minutesLeft * 60)
+        product = Product.objects.get(name=name)
+        if product.is_active() or (request.user.is_authenticated() and request.user.username in authorizedUsers):
+            product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.endTime)
+            if product.daysLeft < 0:
+                product.daysLeft = 0
+                product.hoursLeft = 0
+                product.minutesLeft = 0
+                product.secondsLeft = 0
+            current_arrival = track_arrival(request, "unknown")
+            track_product_view(request, current_arrival, product, request.GET.get('pat', False))
+            return render_to_response("showgame.html", RequestContext(request, {"product":product}))
         else:
-            game.daysLeft = 0
-            game.hoursLeft = 0
-            game.minutesLeft = 0
-            game.secondsLeft = 0
-        consoles = Console.objects.all().order_by("name")
-        return render_to_response("showgame.html", RequestContext(request, {"game":game, "consoles":consoles}))
+            return redirect('/')
     except ObjectDoesNotExist:
         return redirect('/')
-        
-def myAccount(request):
+
+
+def account_page(request):
+    current_arrival = track_arrival(request, "unknown")
     if request.user.is_authenticated():
         if request.method == "POST":
             email = request.POST['email']
-            currPass = request.POST['currPass']
-            newPass = request.POST['newPass']
-            confPass = request.POST['confPass']
-            if email == "" or currPass == "" or newPass == "" or newPass != confPass or len(newPass) < 8:
+            curr_pass = request.POST['currPass']
+            new_pass = request.POST['newPass']
+            conf_pass = request.POST['confPass']
+            if email == "" or curr_pass == "" or new_pass == "" or new_pass != conf_pass or len(new_pass) < 8:
                 return redirect('/')
-            user = User.objects.get(id=request.user.id)
-            user.set_password(newPass)
-            user.email = email
-            user.save()
-            return redirect('/account')
+            if auth.authenticate(username=request.user.username, password=curr_pass):
+                user = User.objects.get(id=request.user.id)
+                user.set_password(new_pass)
+                user.email = email
+                user.save()
+                return redirect('/account')
+            else:
+                return redirect('/')
         else:
             cartLength = 0
             rewardsLeft = 0
@@ -628,14 +508,14 @@ def myAccount(request):
             try:
                 cart = Cart.objects.get(user=request.user)
                 cartLength = len(cart.items.all())
-                credits = GameCredit.objects.filter(user=request.user)
+                credits = Credit.objects.filter(user=request.user)
                 for credit in credits:
                     rewardsTotal += credit.credit
                     rewardsLeft += credit.credit - credit.used
-                orders = GameOrder.objects.filter(user=request.user)
+                orders = Order.objects.filter(user=request.user)
                 for order in orders:
-                    order.game = order.game_set.all()[0]
-                    order.tier = order.gamecredit_set.all()
+                    order.product = order.product_set.all()[0]
+                    order.tier = order.credit_set.all()
                     if len(order.tier) > 0:
                         order.tier = order.tier[0].tier
                     else:
@@ -645,95 +525,141 @@ def myAccount(request):
                         order.picture = order.game.pictures.all()[0]
             except ObjectDoesNotExist:
                 pass
-            return render_to_response("account.html", RequestContext(request, {"cartLength":cartLength, 
-                                                                            "rewardsLeft":rewardsLeft, 
+            return render_to_response("account.html", RequestContext(request, {"cartLength":cartLength,
+                                                                            "rewardsLeft":rewardsLeft,
                                                                             "rewardsTotal":rewardsTotal,
                                                                             "orders":orders}))
     else:
         return HttpResponse("Please Login first")
-        
-def upcomingGames(request):
-    consoles = Console.objects.all().order_by("name")
-    games = list()
-    g = Game.objects.all().order_by("startTime")
-    for game in g:
-        if game.is_upcoming():
-            if len(game.pictures.all()) > 0:
-                game.picture = game.pictures.all()[0]
-            game.orderCount = len(game.orders.all())
-            countdown = game.startTime.astimezone(timezone.utc).replace(tzinfo=None) - datetime.now()
-            game.daysLeft = countdown.days
-            game.hoursLeft = countdown.seconds / 3600
-            game.minutesLeft = (countdown.seconds - (game.hoursLeft * 3600)) / 60
-            game.secondsLeft = (countdown.seconds - (game.hoursLeft * 3600)) - (game.minutesLeft * 60)
-            games.append(game)
-    return render_to_response("upcoming.html", RequestContext(request, {"consoles":consoles, "games":games}))
-        
-def allGames(request):
-    consoles = Console.objects.all().order_by("name")
-    games = list()
-    g = Game.objects.all().order_by("endTime")
-    for game in g:
-        if game.is_active():
-            if len(game.pictures.all()) > 0:
-                game.picture = game.pictures.all()[0]
-            game.orderCount = len(game.orders.all())
-            countdown = game.endTime.astimezone(timezone.utc).replace(tzinfo=None) - datetime.now()
-            game.daysLeft = countdown.days
-            game.hoursLeft = countdown.seconds / 3600
-            game.minutesLeft = (countdown.seconds - (game.hoursLeft * 3600)) / 60
-            game.secondsLeft = (countdown.seconds - (game.hoursLeft * 3600)) - (game.minutesLeft * 60)
-            games.append(game)
-    return render_to_response("allgames.html", RequestContext(request, {"consoles":consoles, "games":games}))
-    
-def consoleGames(request, console):
-    try:
-        console = Console.objects.get(name=console)
-    except ObjectDoesNotExist:
-        return redirect('/games')
-    consoles = Console.objects.all().order_by("name")
-    games = list()
-    g = Game.objects.all().order_by("endTime")
-    for game in g:
-        isConsole = False
-        if game.is_active():
-            for c in game.consoles.all():
-                if c == console:
-                    isConsole = True
-            if len(game.pictures.all()) > 0:
-                game.picture = game.pictures.all()[0]
-            game.orderCount = len(game.orders.all())
-            countdown = game.endTime.astimezone(timezone.utc).replace(tzinfo=None) - datetime.now()
-            game.daysLeft = countdown.days
-            game.hoursLeft = countdown.seconds / 3600
-            game.minutesLeft = (countdown.seconds - (game.hoursLeft * 3600)) / 60
-            game.secondsLeft = (countdown.seconds - (game.hoursLeft * 3600)) - (game.minutesLeft * 60)
-            if isConsole:
-                games.append(game)
-    return render_to_response("allgames.html", RequestContext(request, {"consoles":consoles, "games":games}))
+
+
+def upcoming_products(request):
+    current_arrival = track_arrival(request, "unknown")
+    products = get_products(mode="upcoming", order="startTime")
+    for product in products:
+        product.picture = product.pictures.all()[0]
+    return render_to_response("upcoming.html", RequestContext(request, {"products":products}))
+
+
+def all_products(request):
+    current_arrival = track_arrival(request, "unknown")
+    products = get_products("active")
+    for product in products:
+        product.picture = product.pictures.all()[0]
+        product.order_count = len(product.orders.all())
+    return render_to_response("allgames.html", RequestContext(request, {"products":products}))
+
 
 def index(request):
-    allGames = Game.objects.all().order_by("endTime")
-    startGames = Game.objects.all().order_by("startTime")
-    games = list()
-    upcoming = list()
+    current_arrival = track_arrival(request, "unknown")
+    print current_arrival
+    products = get_products("active")
+    upcoming = get_products("upcoming-next", "startTime")
+    return render_to_response("index.html", RequestContext(request, {"products":products, "upcoming":upcoming}))
+
+
+def get_products(mode = "all", order = "endTime", name = None):
+    """
+        active = Product is currently on sale and > 0 pictures, startTime < Now < endTime
+        past = Product has past sale and > 0 pictures
+        upcoming-shown = Product is going on sale within 24 hours
+        upcoming-hidden = Product is going on sale but not within 24 hours
+    """
+    products = list()
+    upcoming = None
+    single_product = None
+    all_products = Product.objects.all().order_by(order)
+    for product in all_products:
+        if mode == "all":
+            product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.endTime)
+            products.append(product)
+        elif mode == "active":
+            if product.is_active() and product.is_ready():
+                product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.endTime)
+                products.append(product)
+        elif mode == "past":
+            if product.is_past() and product.is_ready():
+                product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.endTime)
+                products.append(product)
+        elif mode == "upcoming":
+            if product.is_upcoming() and product.is_ready():
+                product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.startTime)
+                products.append(product)
+        elif mode == "upcoming-shown":
+            if product.is_upcoming_show():
+                product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.startTime)
+                products.append(product)
+        elif mode == "upcoming-hidden":
+            if product.is_upcoming_hide():
+                product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.startTime)
+                products.append(product)
+        elif mode == "upcoming-next":
+            print "here"
+            if product.is_upcoming():
+                print "now here"
+                product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.startTime)
+                upcoming = product
+        elif mode == "single":
+            try:
+                single_product = Product.objects.get(name=name)
+                single_product.daysLeft, single_product.hoursLeft, single_product.minutesLeft, single_product.secondsLeft = get_product_time_left(product.endTime)
+            except ObjectDoesNotExist:
+                single_product = None
+    if mode == "upcoming-next":
+        return upcoming
+    return products
+
+
+def get_product_time_left(product_time):
     now = datetime.now()
-    for game in allGames:
-        if game.is_active():
-            if len(games) < 5:
-                countdown = game.endTime.astimezone(timezone.utc).replace(tzinfo=None) - now
-                game.daysLeft = countdown.days
-                game.hoursLeft = countdown.seconds / 3600
-                game.minutesLeft = (countdown.seconds - (game.hoursLeft * 3600)) / 60
-                game.secondsLeft = (countdown.seconds - (game.hoursLeft * 3600)) - (game.minutesLeft * 60)
-                games.append(game);
-    for game in startGames:
-        if not game.is_active():
-            delta = game.startTime.astimezone(timezone.utc).replace(tzinfo=None) - now
-            if delta.days >= 0 and len(upcoming) == 0:
-                game.daysLeft = delta.days
-                game.hoursLeft = delta.seconds / 3600
-                game.minutesLeft = (delta.seconds - (game.hoursLeft * 3600)) / 60
-                game.secondsLeft = (delta.seconds - (game.hoursLeft * 3600)) - (game.minutesLeft * 60)
-                upcoming.append(game)
-    return render_to_response("index.html", RequestContext(request, {"games":games, "upcoming":upcoming}))
+    delta = product_time.astimezone(timezone.utc).replace(tzinfo=None) - now
+    daysLeft = delta.days
+    hoursLeft = delta.seconds / 3600
+    minutesLeft = (delta.seconds - (hoursLeft * 3600)) / 60
+    secondsLeft = (delta.seconds - (hoursLeft * 3600)) - (minutesLeft * 60)
+    return [daysLeft, hoursLeft, minutesLeft, secondsLeft]
+
+
+def track_arrival(request, traffic_type):
+    ip = get_client_ip(request)
+    user_agent = request.META.get('HTTP_USER_AGENT')
+    if request.user.is_authenticated():
+        user = request.user
+    else:
+        user = None
+    yesterday = date.today() - timedelta(days=1)
+    last_arrival = Arrival.objects.filter(user=user,
+                                          user_agent=user_agent,
+                                          ip=ip,
+                                          created_at__gte=yesterday).order_by("created_at")
+    if len(last_arrival) == 0:
+        traffic_type = TrafficType.objects.get(name=traffic_type)
+        last_arrival = Arrival(ip = ip, user_agent = user_agent, traffic_type = traffic_type, user = user)
+        last_arrival.save()
+    else:
+        last_arrival = last_arrival[0]
+    return last_arrival
+
+
+def track_product_view(request, current_arrival, product, product_arrival_type):
+    if request.user.is_authenticated():
+        user = request.user
+    else:
+        user = None
+    if product_arrival_type == "i":
+        pat = ProductArrivalType.objects.get(name="index_page")
+    elif product_arrival_type == "ap":
+        pat = ProductArrivalType.objects.get(name="products_page")
+    else:
+        pat = None
+    product_view = ProductView(user=user, product_arrival_type=pat, product=product, arrival=current_arrival)
+    product_view.save()
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[-1].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip

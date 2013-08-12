@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/popbox.css" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/template.css" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.timepicker.css" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ css }}.css" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{{ title }}</title>
@@ -15,7 +16,7 @@
     <div class="navbar-inner">
         <div class="container" id="topBar">
             <div id="leftTopBar">
-                <h3 id="logo" class="brand">Adelie Online</h3>
+                <a href="/"><h3 id="logo" class="brand">Adelie Online</h3></a>
                 <h5 id="tagLine">Rewarding the Pre-Order Community</h5>
             </div>
             <div id="rightTopBar" class="nav-collapse">
@@ -33,33 +34,33 @@
                                 <div class='arrow'></div>
                                 <div class='arrowborder'></div>
                                 <div id="regForm">
-                                    <label class="regLabel">Username: 
+                                    <label class="regLabel">Username:
                                         <span class="regError" id="userError">Username already exists</span>
                                         <span class="regError" id="blankUserError">Please enter a username</span>
                                     </label>
                                         <input type="text" id="username" />
-                                    
+
                                     <label class="regLabel">Email:
                                         <span class="regError" id="emailError">Email already exists</span>
                                         <span class="regError" id="blankEmailError">Please enter an email</span>
                                         <span class="regError" id="validEmailError">Please enter a valid email</span>
                                     </label>
                                         <input type="text" id="email" />
-                                        
-                                    <label class="regLabel">Password: 
+
+                                    <label class="regLabel">Password:
                                         <span class="regError" id="passError">Passwords don't match</span>
                                         <span class="regError" id="blankPassError">Please enter a password</span>
                                     </label>
                                         <input type="password" id="pass1" />
                                     <label class="regLabel">Repeat Password: </label>
                                         <input type="password" id="pass2" /><br /><br />
-                                    
+
                                     <a href="#" class="closepopup">Cancel</a>
                                     <a href="#" id="register" onclick="register()">Register</a>
                                 </div>
                                 <div id="regSuccess">
                                     <p id="successP">Thank you for regsitering.<br />You can now log in</p>
-                                    <a href="#" class="closepopup">Close</a>
+                                    <a href="#" class="close closepopup">Close</a>
                                 </div>
                             </div>
                         </div>
@@ -76,10 +77,10 @@
                                     <input type="text" id="loginUser" />
                                 <label class="regLabel">Password: </label>
                                     <input type="password" id="loginPass" /><br /><br />
-                                
+
                                 <a href="#" class="closepopup">Cancel</a>
                                 <a href="#" id="register" onclick="login()" tabIndex=1>Login</a>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -97,7 +98,7 @@
         <ul class="nav">
             <li class="{% if page == 'index' %}active{% endif %}"><a href="/">Home</a></li>
             <li class="{% if page == 'upcoming' %}active{% endif %}"><a href="/upcoming">Upcoming</a></li>
-            <li class="{% if page == 'games' %}active{% endif %}"><a href="/games">Games</a></li>
+            <li class="{% if page == 'products' %}active{% endif %}"><a href="/products">Products</a></li>
             <li class="{% if page == 'news' %}active{% endif %}"><a href="#">News</a></li>
             <li class="{% if page == 'about' %}active{% endif %}"><a href="#">How It Works</a></li>
             {% if user.is_authenticated %}

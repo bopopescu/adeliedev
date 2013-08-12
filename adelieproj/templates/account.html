@@ -57,17 +57,16 @@
                         <li>
                             <div class="span3 orderInfo">
                                 Ordered: {{ order.created_at|date:"m/d/Y" }}<br />
-                                Ships On: {{ order.game.shipDate|date:"m/d/Y" }}<br />
-                                Receipient: {{ order.shippingAddress.name }}<br />
-                                Price: ${{ order.game.price|floatformat:2 }} <br />
+                                Ships On: {{ order.product.shipDate|date:"m/d/Y" }}<br />
+                                Recipient: {{ order.shippingAddress.name }}<br />
+                                Price: ${{ order.product.price|floatformat:2 }} <br />
                                 Discount Tier: {{ order.tier }}
                             </div>
-                            <div class="span2 orderGameInfo">
+                            <div class="span2 order_product_info">
                                 <img src="{{ order.picture.picture.url }}" width="120px"/>
                             </div>
                             <div class="span3">
-                                {{ order.game.title }} <br />
-                                {{ order.console.name }}
+                                {{ order.product.title }} <br />
                             </div>
                             <div class="clear"> </div>
                         </li>

@@ -107,3 +107,9 @@
 .popbox {
     z-index: 100;
 }
+
+.closepopup {
+    font-size: 13px;
+    font-weight: normal;
+    opacity: 1;
+}

@@ -2,35 +2,15 @@
 <div class="container-fluid">
     {% if user.is_authenticated %}
         {% for order in cart.items.all %}
-            {{ order.game.title }} <br />
+            {{ order.product.name }} <br />
             <label>Quantity:</label><input type="text" id="{{ order.id }}_quantity" value="{{ order.quantity }}" /> <br />
-            <label>Console:</label>
-            <select id="{{ order.id }}_console">
-                {% for console in order.game.consoles.all %}
-                    {% if order.console == console %}
-                        <option value="{{ console.id }}" selected>{{ console.name }}</option>
-                    {% else %}
-                        <option value="{{ console.id }}">{{ console.name }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select><br />
             <button onClick="updateQuantity({{ order.id }})">Update</button>
             <button onClick="deleteItem({{ order.id }})">Delete</button><br />
         {% endfor %}
     {% else %}
         {% for item in cart %}
-            {{ item.game.title }} <br />
+            {{ item.product.name }} <br />
             <label>Quantity:</label><input type="text" id="{{ item.id }}_quantity" value="{{ item.quantity }}" /> <br />
-            <label>Console:</label>
-            <select id="{{ item.id }}_console">
-                {% for console in item.game.consoles.all %}
-                    {% if item.console == console %}
-                        <option value="{{ console.id }}" selected>{{ console.name }}</option>
-                    {% else %}
-                        <option value="{{ console.id }}">{{ console.name }}</option>
-                    {% endif %}
-                {% endfor %}
-            </select><br />
             <button onClick="updateQuantity({{ item.id }})">Update</button>
             <button onClick="deleteItem({{ item.id }})">Delete</button><br />
         {% endfor %}

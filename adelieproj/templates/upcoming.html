@@ -4,40 +4,37 @@
         <div class="span2">
             <div class="hero-unit" id="leftHolder">
                 <ul id="consoleList">
-                    <li><a href="/games">All Games</a></li>
-                    {% for console in consoles %}
-                        <li><a href="/games/{{ console.name }}">{{ console.name }}</a></li>
-                    {% endfor %}
+                    <li><a href="/products">All Products</a></li>
                 </ul>
             </div>
         </div>
         <div class="span10 row" id="rightHolder">
             <ul id="gameList">
-                {% for game in games %}
-                    {% if game.daysLeft == 0 %}
-                        <li id="list{{ game.id }}">
+                {% for product in products %}
+                    {% if product.daysLeft == 0 %}
+                        <li id="list{{ product.id }}">
                             <div class="span2">
-                                <span class="picture"><img src="{{ game.picture.picture.url }}" width="100px" height="100px" /></span><br />
+                                <span class="picture"><img src="{{ product.picture.picture.url }}" width="100px" height="100px" /></span><br />
                             </div>
                             <div class="span2">
-                                <span class="title">{{ game.title }}</span> <br />
-                                <span class="ships">Ships: {{ game.shipDate|date:"m/d/Y" }}</span>
+                                <span class="title">{{ product.name }}</span> <br />
+                                <span class="ships">Ships: {{ product.shipDate|date:"m/d/Y" }}</span>
                             </div>
                             <div class="span3">
-                                {{ game.description }}
-                                <span class="ends">Ends: {{ game.daysLeft }}:{{ game.hoursLeft }}:{{ game.minutesLeft }}:{{ game.secondsLeft }}</span>
+                                {% if product.description|length > 160 %}
+                                    {{ product.description|slice:":160" }}...<a href="/products/show/{{ product.name }}">Read More</a>
+                                {% else %}
+                                    {{ product.description }}
+                                {% endif %}
+                                <span class="ends">Ends: {{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span>
                             </div>
                             <div class="span2">
-                                <button class="preorderButton" onClick="window.location = '/games/show/{{ game.title }}'">Pre-Order Now</button> <br />
-                                {% for console in game.consoles.all %}
-                                    <span class="console">{{ console.name }}</span>
-                                {% endfor %}
+                                <button class="preorderButton" onClick="window.location = '/products/show/{{ product.name }}'">Pre-Order Now</button> <br />
                             </div>
                         </li>
                     {% else %}
-                        <li id="list{{ game.id }}">
+                        <li id="list{{ product.id }}">
                             <div class="span2">
-                                <!--<span class="picture"><img src="{{ game.picture.picture.url }}" width="100px" height="100px" /></span><br />-->
                             </div>
                             <div class="span2">
                                 <span class="title">??????????</span> <br />
@@ -45,14 +42,8 @@
                             </div>
                             <div class="span3">
                                 <h3>Pre-Order Starts In:</h3>
-                                <span class="ends">{{ game.daysLeft }}:{{ game.hoursLeft }}:{{ game.minutesLeft }}:{{ game.secondsLeft }}</span><br />
+                                <span class="ends">{{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span><br />
                                 <span>We will announce the title 24 hours before the start of the sale. Get Psyched!</span>
-                            </div>
-                            <div class="span2">
-                                Consoles:<br />
-                                {% for console in game.consoles.all %}
-                                    <span class="console">{{ console.name }}</span><br />
-                                {% endfor %}
                             </div>
                         </li> 
                     {% endif %}

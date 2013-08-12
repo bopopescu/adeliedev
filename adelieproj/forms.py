@@ -1,7 +1,7 @@
 from django.forms import ModelForm
-from adelieproj.models import GamePicture
+from adelieproj.models import Picture
 
-class GamePictureForm(ModelForm):
+class PictureForm(ModelForm):
     class Meta:
-        model = GamePicture
+        model = Picture
         fields = ['picture', 'caption']

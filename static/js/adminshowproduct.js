@@ -6,81 +6,72 @@ $(function() {
     $('#product_end_time').timepicker({ 'timeFormat': 'H:i:s' });
 });
 
-function submitGame() {
+function editGame() {
     $(".error").css("display", "none");
     name = $("#product_name").val();
     description = $("#product_desc").val();
     start = $("#product_start").val();
-    startTime = $("#product_start_time").val();
+    start_time = $("#product_start_time").val();
     end = $("#product_end").val();
-    endTime = $("#product_end_time").val();
-    ship = $("#product_ship").val();
+    end_time = $("#product_end_time").val();
     price = $("#product_price").val();
+    product_id = $("#product_id").val();
     tagline = $("#product_tag_line").val();
-    saveGame = true;
+    ship = $("#product_ship").val();
+    edit_game = true;
     if (name == "") {
         $("#titleBlank").css("display", "inline");
-        saveGame = false;
-    }
-    else {
-        $.ajax({
-            url: '/ajax/checkproductname/' + name,
-            async: false,
-            success: function (response) {
-                        if (response == "True") {
-                            $("#titleDuplicate").css("display", "inline");
-                            saveGame = false;
-                        }
-                    }
-        });
+        edit_game = false;
     }
     if (tagline == "") {
         $("#tagBlank").css("display", "inline");
-        saveGame = false;
-    }
-    if (price == "") {
-        $("#priceBlank").css("display", "inline");
-        saveGame = false;
-    }
-    if (price < 0) {
-        $("#priceBelowZero").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
     }
     if (description == "") {
         $("#descBlank").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
     }
-    if (start == "" || startTime == "") {
+    if (price == "") {
+        $("#priceBlank").css("display", "inline");
+        edit_game = false;
+    }
+    if (price < 0) {
+        $("#priceBelowZero").css("display", "inline");
+        edit_game = false;
+    }
+    if (start == "" || start_time == "") {
         $("#startBlank").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
     }
-    if (end == "" || endTime == "") {
+    if (end == "" || end_time == "") {
         $("#endBlank").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
     }
     if (end < start) {
         $("#timeDiff").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
     }
     if (ship == "") {
         $("#shipBlank").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
     }
     if (ship < end) {
         $("#shipError").css("display", "inline");
-        saveGame = false;
+        edit_game = false;
+    }
+    if (typeof parseInt(product_id) != "number") {
+        edit_game = false;
     }
 
-    if (saveGame) {
+    if (edit_game) {
         $.ajax({
-            url: '/ajax/saveproduct',
-            data: {name: name, desc: description, start: start, startTime: startTime, end: end, endTime: endTime, price: price, ship:ship, tagline:tagline},
+            url: '/ajax/editproduct',
+            data: {name: name, desc: description, start: start, start_time:start_time, end: end, end_time:end_time, product_id: product_id, price: price, ship:ship, tagline:tagline},
             type: "POST",
             async: false,
             success: function (response) {
                         if (response == "False") {
                             $("#unknownErorr").css("display", "inline");
-                            regGame = false;
                         }
                         else if (typeof parseInt(response) == "number") {
                             window.location = "/admin/showproduct/" + response;
@@ -90,14 +81,14 @@ function submitGame() {
     }
 }
 
-function giveCredit(gameId) {
+function deletePic(picId) {
     $.ajax({
-        url: '/ajax/givecredit',
-        data: {gameId:gameId},
+        url: '/ajax/deletepic',
+        data: {picId: picId},
         type: "POST",
         async: false,
         success: function (response) {
-                    //window.location = "/admin/showcredit/" + gameId;
+                    location.reload();
                 }
     });
 }

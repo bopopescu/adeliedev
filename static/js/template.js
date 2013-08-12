@@ -1,0 +1,3 @@
+$.ajaxSetup({
+  data: {csrfmiddlewaretoken: csrftoken },
+});
