@@ -52,7 +52,7 @@
                     <li>
                         <img src="{{ pic.picture.url }}" height="90px" width="90px" />
                         <span class="picCaption">{{ pic.caption }}
-                        <button class="picdelete" onClick="deletePic({{ pic.id }})">Delete</button></span>
+                        <button class="picdelete btn btn-danger" onClick="deletePic({{ pic.id }})">Delete</button></span>
                     </li>
                 {% endfor %}
                 </ul>
@@ -61,7 +61,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="product_id" id="product_id" value="{{ product.id }}" />
                 {{ pictureForm }}<br />
-                <input type="submit" value="Add Picture" />
+                <input type="submit" class="btn btn-primary" value="Add Picture" />
             </form>
         </div>
     </div>

@@ -11,10 +11,11 @@
                     <span class="price"><h2>${{ product.price|floatformat:2 }}</h2></span><br />
                 </div>
                 <div id="middleSlide" class="span6">
-                    <span class="countdown">{{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span> <br />
+                    <span class="countdown" id="countdown_game_{{ product.id }}"></span> <br />
                     <br />
+                    <img class="main_picture" id="main_picture_product_{{ product.id }}" src="{{ product.pictures.all.0.picture.url }}" width="425px;" />
                     {% for picture in product.pictures.all %}
-                        <img src="{{ picture.picture.url }}" height="90px" width="75px;" />
+                    <img class="small_picture" src="{{ picture.picture.url }}" onClick="change_picture('{{ product.id }}', '{{ picture.picture.url }}');" width="85px;" />
                     {% endfor %}
                 </div>
                 <div id="rightSlide" class="span3">
@@ -38,13 +39,28 @@
         {% if upcoming %}
             {% if upcoming.daysLeft == 0 %}
                 <h1>{{ upcoming.name }}</h1>
-                {{ upcoming.daysLeft }}:{{ upcoming.hoursLeft }}:{{ upcoming.minutesLeft }}:{{ upcoming.secondsLeft }} <br />
+                <span id="countdown_upcoming"></span>
             {% else %}
                 <h1>Next Game Pre-Order Begins In:</h1>
-                {{ upcoming.daysLeft }}:{{ upcoming.hoursLeft }}:{{ upcoming.minutesLeft }}:{{ upcoming.secondsLeft }} <br />
+                <span id="countdown_upcoming"></span>
                 <p>Check back 24 hours before launch to find out what awesome game is released! Pre-Order early for greater rewards!</p>
             {% endif %}
         {% endif %}
     </div>
 </div>
+<script type="text/javascript">
+    all_products = []
+    product_picture_sources = []
+    {% for product in products %}
+        all_products.push(['{{ product.id }}', '+{{ product.daysLeft }}d +{{ product.hoursLeft }}h +{{ product.minutesLeft }}m +{{ product.secondsLeft }}s']);
+        product_pictures = []
+        {% for picture in product.pictures.all %}
+            product_pictures.push('{{ picture.picture.url }}')
+        {% endfor %}
+        product_picture_sources.push(product_pictures);
+    {% endfor %}
+    {% if upcoming %}
+        upcoming_countdown = '+{{ upcoming.daysLeft }}d +{{ upcoming.hoursLeft }}h +{{ upcoming.minutesLeft }}m +{{ upcoming.secondsLeft }}s'
+    {% endif %}
+</script>
 {% include "footer.html" with js="index" %}

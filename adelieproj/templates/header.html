@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/template.css" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui.css" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.timepicker.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery.countdown.css" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/{{ css }}.css" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{{ title }}</title>
@@ -104,6 +105,7 @@
             {% if user.is_authenticated %}
                 <li class="{% if page == 'account' %}active{% endif %}"><a href="/account">My Account</a></li>
             {% endif %}
+            <li id="right_nav"><a href="/cart">My Cart <span id="cart_number">{{ cart_number }}</span></a></li>
         </ul>
         </div>
     </div>

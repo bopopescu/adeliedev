@@ -1,3 +1,9 @@
+$(document).ready(function() {
+    $.each(product_countdowns, function(index, value) {
+        $("#countdown_game_" + value[0]).countdown({until: value[1]});
+    });
+});
+
 function sortByName(a, b) {
     var aName = a['title'].toLowerCase();
     var bName = b['title'].toLowerCase();

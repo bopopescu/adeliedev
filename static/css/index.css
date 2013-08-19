@@ -79,4 +79,13 @@
     text-align: center;
     color: white;
     background-color: black;
+    height: 100px;
+}
+
+.main_picture {
+    max-height: 240px;
+}
+
+.small_picture {
+    cursor: pointer;
 }

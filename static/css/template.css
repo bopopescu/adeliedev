@@ -113,3 +113,16 @@
     font-weight: normal;
     opacity: 1;
 }
+
+.nav {
+    width: 100%;
+}
+
+#right_nav {
+    float: right;
+}
+
+#cart_number {
+    background-color: white;
+    color: black;
+}

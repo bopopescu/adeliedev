@@ -1,14 +1,7 @@
 {% include "header.html" with page="products" css="allproducts" title="Adelie Online" %}
 <div class="container">
     <div class="row">
-        <div class="span2">
-            <div class="hero-unit" id="leftHolder">
-                <ul id="consoleList">
-                    <li><a href="/products">All Products</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="span10 row" id="rightHolder">
+        <div class="span12 row" id="rightHolder">
             <select id="sort" onChange="sort_products();">
                 <option value="ending">Ending Soonest</option>
                 <option value="alphabetical">Alphabetical</option>
@@ -18,24 +11,31 @@
             <ul id="products_list">
                 {% for product in products %}
                     <li id="list{{ product.id }}">
-                        <div class="span2">
-                            <span class="picture"><img src="{{ product.picture.picture.url }}" width="100px" height="100px" /></span><br />
-                            <span class="ends">Ends: {{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span>
-                        </div>
-                        <div class="span2">
-                            <a href="/products/show/{{ product.name }}?pat=ap"><span class="title">{{ product.name }}</span></a> <br />
-                            <span class="ships">Ships: {{ product.shipDate|date:"m/d/Y" }}</span>
-                        </div>
-                        <div class="span3">
+                        <table><tr>
+                            <td>
+                                <span class="picture"><img src="{{ product.picture.picture.url }}" width="100px" height="100px" /></span><br />
+                            </td>
+                            <td>
+                                <a href="/products/show/{{ product.name }}?pat=ap"><span class="title">{{ product.name }}</span></a> <br />
+                                <span class="ships">Ships: {{ product.shipDate|date:"m/d/Y" }}</span>
+                            </td>
+                            <td>
                             {% if product.description|length > 160 %}
                                 {{ product.description|slice:":160" }}...<a href="/products/show/{{ product.name }}">Read More</a>
                             {% else %}
                                 {{ product.description }}
                             {% endif %}
-                        </div>
-                        <div class="span2">
+                            </td>
+                            <td>
                             <button class="preorderButton" onClick="window.location = '/products/show/{{ product.name }}?pat=ap'">Pre-Order Now</button> <br />
-                        </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5">
+                                <span class="ends">Ends: </span><br />
+                                <span id="countdown_game_{{ product.id }}"></span>
+                            </td>
+                    </tr></table>
                     </li>
                 {% endfor %}
             </ul>
@@ -44,7 +44,9 @@
 </div>
 <script type="text/javascript">
     products = [];
+    product_countdowns = [];
     {% for product in products %}
+        product_countdowns.push(['{{ product.id }}', '+{{ product.daysLeft }}d +{{ product.hoursLeft }}h +{{ product.minutesLeft }}m +{{ product.secondsLeft }}s']);
         product = {}
         product['id'] = "{{ product.id }}";
         product['title'] = "{{ product.name }}";

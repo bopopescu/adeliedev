@@ -1,14 +1,7 @@
 {% include "header.html" with page="upcoming" css="upcoming" title="Adelie Online" %}
 <div class="container">
     <div class="row">
-        <div class="span2">
-            <div class="hero-unit" id="leftHolder">
-                <ul id="consoleList">
-                    <li><a href="/products">All Products</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="span10 row" id="rightHolder">
+        <div class="span12 row" id="rightHolder">
             <ul id="gameList">
                 {% for product in products %}
                     {% if product.daysLeft == 0 %}
@@ -20,13 +13,14 @@
                                 <span class="title">{{ product.name }}</span> <br />
                                 <span class="ships">Ships: {{ product.shipDate|date:"m/d/Y" }}</span>
                             </div>
-                            <div class="span3">
+                            <div class="span4">
                                 {% if product.description|length > 160 %}
                                     {{ product.description|slice:":160" }}...<a href="/products/show/{{ product.name }}">Read More</a>
                                 {% else %}
                                     {{ product.description }}
                                 {% endif %}
-                                <span class="ends">Ends: {{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span>
+                                <span class="ends">Ends: </span>
+                                <span id="countdown_game_{{ product.id }}"></span>
                             </div>
                             <div class="span2">
                                 <button class="preorderButton" onClick="window.location = '/products/show/{{ product.name }}'">Pre-Order Now</button> <br />
@@ -40,9 +34,9 @@
                                 <span class="title">??????????</span> <br />
                                 <span class="ships">Ships: ??????????</span>
                             </div>
-                            <div class="span3">
+                            <div class="span4">
                                 <h3>Pre-Order Starts In:</h3>
-                                <span class="ends">{{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span><br />
+                                <span id="countdown_game_{{ product.id }}"></span>
                                 <span>We will announce the title 24 hours before the start of the sale. Get Psyched!</span>
                             </div>
                         </li> 
@@ -52,4 +46,10 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    upcoming_products = []
+    {% for product in products %}
+        upcoming_products.push(['{{ product.id }}', '+{{ product.daysLeft }}d +{{ product.hoursLeft }}h +{{ product.minutesLeft }}m +{{ product.secondsLeft }}s']);
+    {% endfor %}
+</script>
 {% include "footer.html" with js="upcoming" %}

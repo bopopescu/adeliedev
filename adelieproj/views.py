@@ -15,7 +15,8 @@ def admin(request):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
             products = Product.objects.all()
-            return render_to_response("admin.html", RequestContext(request, {"products":products}))
+            cart_number = get_cart_number(request)
+            return render_to_response("admin.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
     return redirect('/')
 
 
@@ -46,8 +47,10 @@ def admin_show_product(request, product_id):
                         return redirect('/admin/showproduct/' + product_id)
                 else:
                     pictureForm = PictureForm()
+                    cart_number = get_cart_number(request)
                     return render_to_response("adminshowproduct.html", RequestContext(request, {"product":product,
-                                                                                             "pictureForm":pictureForm,}))
+                                                                                             "pictureForm":pictureForm,
+                                                                                             "cart_number":cart_number,}))
             except ObjectDoesNotExist:
                 return redirect('/admin')
     return redirect('/')
@@ -248,7 +251,7 @@ def admin_edit_product(request):
 
 def login(request):
     if request.is_ajax():
-        username = request.POST['username']
+        username = request.POST['username'].lower()
         password = request.POST['pass']
         user = auth.authenticate(username=username, password=password)
         if user is not None:
@@ -373,24 +376,25 @@ def update_cart(request):
 
 
 def show_cart(request):
-    current_arrival = track_arrival(request, "unknown")
+    track_arrival(request, "unknown")
+    cart_number = get_cart_number(request)
     if request.user.is_authenticated():
         try:
             cart = Cart.objects.get(user=request.user, checkedOut=False)
-            return render_to_response("showcart.html", RequestContext(request, {"cart":cart}))
+            return render_to_response("showcart.html", RequestContext(request, {"cart_number":cart_number, "cart":cart}))
         except ObjectDoesNotExist:
             cart = Cart(user=request.user)
             cart.save()
-            return render_to_response("showcart.html", RequestContext(request, {"cart":cart}))
+            return render_to_response("showcart.html", RequestContext(request, {"cart_number":cart_number, "cart":cart}))
     else:
         if request.session.get('cart', False) == False:
             request.session['cart'] = list()
             request.session.modified = True
-        return render_to_response("showcart.html", RequestContext(request, {"cart":request.session['cart']}))
+            return render_to_response("showcart.html", RequestContext(request, {"cart_number":cart_number, "cart":request.session['cart']}))
 
 
 def checkout_page(request):
-    current_arrival = track_arrival(request, "unknown")
+    track_arrival(request, "unknown")
     if request.user.is_authenticated():
         if request.method == 'POST':
             try:
@@ -458,7 +462,7 @@ def checkout_page(request):
             tax = price * .0625
             total = price + tax
             cart_length = len(cart.items.all())
-            return render_to_response("checkout.html", RequestContext(request, {'cart_length': cart_length, 'cart':cart, 'price': price, 'tax': tax, 'total':total, 'items':items}))
+            return render_to_response("checkout.html", RequestContext(request, {"cart_number":cart_length, 'cart_length': cart_length, 'cart':cart, 'price': price, 'tax': tax, 'total':total, 'items':items}))
     else:
         return HttpResponse("Make a login page")
 
@@ -475,7 +479,8 @@ def show_product(request, name):
                 product.secondsLeft = 0
             current_arrival = track_arrival(request, "unknown")
             track_product_view(request, current_arrival, product, request.GET.get('pat', False))
-            return render_to_response("showgame.html", RequestContext(request, {"product":product}))
+            cart_number = get_cart_number(request)
+            return render_to_response("showgame.html", RequestContext(request, {"cart_number":cart_number, "product":product}))
         else:
             return redirect('/')
     except ObjectDoesNotExist:
@@ -483,7 +488,6 @@ def show_product(request, name):
 
 
 def account_page(request):
-    current_arrival = track_arrival(request, "unknown")
     if request.user.is_authenticated():
         if request.method == "POST":
             email = request.POST['email']
@@ -521,41 +525,46 @@ def account_page(request):
                     else:
                         order.tier = "N/A"
                     order.picture = ""
-                    if len(order.game.pictures.all()) > 0:
-                        order.picture = order.game.pictures.all()[0]
+                    if len(order.product_set.all()[0].pictures.all()) > 0:
+                        order.picture = order.product_set.all()[0].pictures.all()[0]
             except ObjectDoesNotExist:
                 pass
+            track_arrival(request, "unknown")
+            cart_number = get_cart_number(request)
             return render_to_response("account.html", RequestContext(request, {"cartLength":cartLength,
                                                                             "rewardsLeft":rewardsLeft,
                                                                             "rewardsTotal":rewardsTotal,
-                                                                            "orders":orders}))
+                                                                            "orders":orders,
+                                                                            "cart_number":cart_number}))
     else:
         return HttpResponse("Please Login first")
 
 
 def upcoming_products(request):
-    current_arrival = track_arrival(request, "unknown")
+    track_arrival(request, "unknown")
+    cart_number = get_cart_number(request)
     products = get_products(mode="upcoming", order="startTime")
     for product in products:
         product.picture = product.pictures.all()[0]
-    return render_to_response("upcoming.html", RequestContext(request, {"products":products}))
+        return render_to_response("upcoming.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
 
 
 def all_products(request):
-    current_arrival = track_arrival(request, "unknown")
+    track_arrival(request, "unknown")
+    cart_number = get_cart_number(request)
     products = get_products("active")
     for product in products:
         product.picture = product.pictures.all()[0]
         product.order_count = len(product.orders.all())
-    return render_to_response("allgames.html", RequestContext(request, {"products":products}))
+        return render_to_response("allgames.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
 
 
 def index(request):
-    current_arrival = track_arrival(request, "unknown")
-    print current_arrival
+    track_arrival(request, "unknown")
+    cart_number = get_cart_number(request)
     products = get_products("active")
     upcoming = get_products("upcoming-next", "startTime")
-    return render_to_response("index.html", RequestContext(request, {"products":products, "upcoming":upcoming}))
+    return render_to_response("index.html", RequestContext(request, {"cart_number":cart_number, "products":products, "upcoming":upcoming}))
 
 
 def get_products(mode = "all", order = "endTime", name = None):
@@ -594,9 +603,7 @@ def get_products(mode = "all", order = "endTime", name = None):
                 product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.startTime)
                 products.append(product)
         elif mode == "upcoming-next":
-            print "here"
             if product.is_upcoming():
-                print "now here"
                 product.daysLeft, product.hoursLeft, product.minutesLeft, product.secondsLeft = get_product_time_left(product.startTime)
                 upcoming = product
         elif mode == "single":
@@ -663,3 +670,21 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def get_cart_number(request):
+    if request.user.is_authenticated():
+        try:
+            cart = Cart.objects.get(user=request.user, checkedOut=False)
+            return len(cart.items.all())
+        except ObjectDoesNotExist:
+            cart = Cart(user=request.user)
+            cart.save()
+            return 0
+    else:
+        if request.session.get('cart', False) == False:
+            request.session['cart'] = list()
+            request.session.modified = True
+            return 0
+        else:
+            return len(request.session.get('cart'))
