@@ -35,8 +35,8 @@
             {% endfor %}
         </div>
     </div>
-    <div id="upcomingGame">
-        {% if upcoming %}
+    {% if upcoming %}
+        <div id="upcomingGame">
             {% if upcoming.daysLeft == 0 %}
                 <h1>{{ upcoming.name }}</h1>
                 <span id="countdown_upcoming"></span>
@@ -45,8 +45,8 @@
                 <span id="countdown_upcoming"></span>
                 <p>Check back 24 hours before launch to find out what awesome game is released! Pre-Order early for greater rewards!</p>
             {% endif %}
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 </div>
 <script type="text/javascript">
     all_products = []
