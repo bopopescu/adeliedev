@@ -1,3 +1,7 @@
+$(document).ready(function () {
+    $("#countdown").countdown({until: product_countdown});
+});
+
 function add_to_cart(product_id) {
     quantity = $("#orderQuantity").val();
     $.ajax({

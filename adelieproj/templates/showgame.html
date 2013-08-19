@@ -12,6 +12,8 @@
             <div id="showGame">
                 <div class="span4" id="leftSide">
                     <p><h1>{{ product.name }}</h1></p>
+                    <span>Sale Ends:</span><br />
+                    <span id="countdown"></span>
                     <span id="gameTagLine"> {{ product.tagLine }}</span>
                     <label>Quantity</label>
                     <select id="orderQuantity">
@@ -24,7 +26,6 @@
                     <button id="placeOrder" onClick="add_to_cart({{ product.id }})">Add To Cart</button>
 
                     <p>Preorder Sale ends:</p>
-                    <span id="countDown">{{ product.daysLeft }}:{{ product.hoursLeft }}:{{ product.minutesLeft }}:{{ product.secondsLeft }}</span
                     <p>{{ product.description }}</p>
                 </div>
                 <div class="span5" id="rightSide">
@@ -42,4 +43,7 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    product_countdown = '+{{ product.daysLeft }}d +{{ product.hoursLeft }}h +{{ product.minutesLeft }}m +{{ product.secondsLeft }}s';
+</script>
 {% include "footer.html" with js="showproduct" %}
