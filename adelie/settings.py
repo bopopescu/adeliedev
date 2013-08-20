@@ -5,7 +5,7 @@ if ENVIRONMENT == 'production':
     DEBUG = False
     ALLOWED_HOSTS = ['adelie.herokuapp.com']
 elif ENVIRONMENT == 'testing':
-    DEBUG = False
+    DEBUG = True
     ALLOWED_HOSTS = ['adeliestaging.herokuapp.com']
 else:
     DEBUG = True
