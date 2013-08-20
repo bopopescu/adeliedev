@@ -78,7 +78,7 @@ class Product(models.Model):
         return self.title
 
     def is_ready(self):
-        return self.pictures.all() > 0
+        return len(self.pictures.all()) > 0
 
     def is_active(self):
         return (self.startTime <= timezone.now() and self.endTime >= timezone.now())
