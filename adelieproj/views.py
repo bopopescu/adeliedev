@@ -545,7 +545,9 @@ def upcoming_products(request):
     cart_number = get_cart_number(request)
     products = get_products(mode="upcoming", order="startTime")
     for product in products:
-        product.picture = product.pictures.all()[0]
+        pictures = product.pictures.all()
+        if len(pictures) > 0:
+            product.picture = pictures[0]
         return render_to_response("upcoming.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
 
 
@@ -554,7 +556,9 @@ def all_products(request):
     cart_number = get_cart_number(request)
     products = get_products("active")
     for product in products:
-        product.picture = product.pictures.all()[0]
+        pictures = product.pictures.all()
+        if len(pictures) > 0:
+            product.picture = pictures[0]
         product.order_count = len(product.orders.all())
         return render_to_response("allgames.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
 
