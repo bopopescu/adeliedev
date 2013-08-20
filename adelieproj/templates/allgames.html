@@ -50,7 +50,7 @@
         product = {}
         product['id'] = "{{ product.id }}";
         product['title'] = "{{ product.name }}";
-        product['purchased'] = {{ product.order_count }};
+        product['purchased'] = '{{ product.order_count }}';
         product['end'] = "{{ product.endDate|date:'y/m/d f' }}";
         products.push(product)
     {% endfor %}
