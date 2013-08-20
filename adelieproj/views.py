@@ -390,7 +390,7 @@ def show_cart(request):
         if request.session.get('cart', False) == False:
             request.session['cart'] = list()
             request.session.modified = True
-            return render_to_response("showcart.html", RequestContext(request, {"cart_number":cart_number, "cart":request.session['cart']}))
+        return render_to_response("showcart.html", RequestContext(request, {"cart_number":cart_number, "cart":request.session['cart']}))
 
 
 def checkout_page(request):
