@@ -31,10 +31,10 @@ elif ENVIRONMENT == 'testing':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'daeqv2es6ii44t',
-            'USER': 'ipewkbsnipaxou',
-            'PASSWORD': '5_xhoPKB7Ox7wNFC0atpP1a2Tl',
-            'HOST': 'ec2-23-23-95-222.compute-1.amazonaws.com',
+            'NAME': 'd82k19sm4n3khl',
+            'USER': 'pnpntcobwihpcu',
+            'PASSWORD': 'E_yCo3jbPZSG993DDTHk3sYzXq',
+            'HOST': 'ec2-54-221-229-7.compute-1.amazonaws.com',
             'PORT': '5432',
         }
     }
