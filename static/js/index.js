@@ -3,7 +3,7 @@ $(document).ready(function() {
     $.each(all_products, function(index, value) {
         $("#countdown_game_" + value[0]).countdown({until: value[1]});
     });
-    if (upcoming_countdown) {
+    if (typeof upcoming_countdown != "undefined") {
         $("#countdown_upcoming").countdown({until: upcoming_countdown});
     }
 });

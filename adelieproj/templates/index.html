@@ -5,7 +5,7 @@
             <div class="slide" id="{% cycle 'slide1' 'slide2' 'slide3' 'slide4' 'slide5' %}">
                 <div id="leftSlide" class="span3">
                     <span class="shipDate">Ships {{ product.shipDate|date:"m/d/Y" }}</span> <br />
-                    <button class="preorderButton" onClick="window.location = '/products/show/{{ product.name }}?pat=i'">Pre-Order</button><br />
+                    <button class="preorderButton btn btn-primary" onClick="window.location = '/products/show/{{ product.name }}?pat=i'">Pre-Order</button><br />
                     <span class="gameTitle"><h1>{{ product.name }}</h1></span><br />
                     <span class="tagLine">"{{ product.tagLine }}"</span><br />
                     <span class="price"><h2>${{ product.price|floatformat:2 }}</h2></span><br />
@@ -20,8 +20,8 @@
                 </div>
                 <div id="rightSlide" class="span3">
                     <span class="desc">
-                        {% if product.description|length > 160 %}
-                            {{ product.description|slice:":160" }}...<a href="/products/show/{{ product.name }}">Read More</a>
+                        {% if product.description|length > 500 %}
+                            {{ product.description|slice:":500" }}...<a href="/products/show/{{ product.name }}">Read More</a>
                         {% else %}
                             {{ product.description }}
                         {% endif %}

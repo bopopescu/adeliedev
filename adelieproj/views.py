@@ -560,7 +560,7 @@ def all_products(request):
         if len(pictures) > 0:
             product.picture = pictures[0]
         product.order_count = len(product.orders.all())
-        return render_to_response("allgames.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
+    return render_to_response("allgames.html", RequestContext(request, {"cart_number":cart_number, "products":products}))
 
 
 def index(request):
