@@ -41,6 +41,11 @@ class ShippingAddress(models.Model):
         return self.title
 
 
+class ProductTier(models.Model):
+    discount = models.FloatField()
+    percent = models.FloatField()
+    tier_number = models.IntegerField()
+
 class Order(models.Model):
     user = models.ForeignKey(User)
     creditCard = models.ForeignKey(CreditCard)
@@ -70,6 +75,7 @@ class Product(models.Model):
     shipDate = models.DateField()
     credited = models.BooleanField(default=False)
     pictures = models.ManyToManyField(Picture)
+    tiers = models.ManyToManyField(ProductTier)
     orders = models.ManyToManyField("Order")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now = True)

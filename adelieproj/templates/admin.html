@@ -16,6 +16,15 @@
                         <td>{{ product.is_ready }}</td>
                         <td>{{ product.is_active }}</td>
                         <td>{{ product.credited }}</td>
+                        <td>
+                            {% if product.is_ready and product.is_past and not product.credited %}
+                                <button class="btn btn-danger :active" onClick="window.location = '/admin/givecredit/{{ product.id }}'">Give Credit</button>
+                            {% elif product.credited %}
+                                <button class="btn btn-success">View Credit</button>
+                            {% else %}
+                                <button class="btn btn-disabled">Not Available Yet</button>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </table>
@@ -54,6 +63,131 @@
                 <span class="error" id="shipBlank">Please enter a shipping date</span>
                 <label>Shipping Date</label>
                 <input type="text" name="product_ship" id="product_ship" autoComplete="off" /><br />
+                <div id="give_credit_form">
+                    <p>Tier 0 should be ~50% of our base users that gets $0 discount<br />
+                    Tier 10 should be 100% discount </p>
+                    <div id="total_percent_error" class="error">
+                        Total Percent must be equal to 100%
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Tier #</th>
+                            <th>Discount (in $)</th>
+                            <th>Percent of Users (in %)</th>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_0_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Tier 0</td>
+                            <td style='text-align:center;'>0</td>
+                            <td><input type="text" name="tier_0_percent" id="tier_0_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_1_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 1</td>
+                            <td><input type="text" name="tier_1_discount" id="tier_1_discount"></td>
+                            <td><input type="text" name="tier_1_percent" id="tier_1_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_2_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 2</td>
+                            <td><input type="text" name="tier_2_discount" id="tier_2_discount"></td>
+                            <td><input type="text" name="tier_2_percent" id="tier_2_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_3_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 3</td>
+                            <td><input type="text" name="tier_3_discount" id="tier_3_discount"></td>
+                            <td><input type="text" name="tier_3_percent" id="tier_3_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_4_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 4</td>
+                            <td><input type="text" name="tier_4_discount" id="tier_4_discount"></td>
+                            <td><input type="text" name="tier_4_percent" id="tier_4_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_5_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 5</td>
+                            <td><input type="text" name="tier_5_discount" id="tier_5_discount"></td>
+                            <td><input type="text" name="tier_5_percent" id="tier_5_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_6_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 6</td>
+                            <td><input type="text" name="tier_6_discount" id="tier_6_discount"></td>
+                            <td><input type="text" name="tier_6_percent" id="tier_6_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_7_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 7</td>
+                            <td><input type="text" name="tier_7_discount" id="tier_7_discount"></td>
+                            <td><input type="text" name="tier_7_percent" id="tier_7_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_8_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 8</td>
+                            <td><input type="text" name="tier_8_discount" id="tier_8_discount"></td>
+                            <td><input type="text" name="tier_8_percent" id="tier_8_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_9_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 9</td>
+                            <td><input type="text" name="tier_9_discount" id="tier_9_discount"></td>
+                            <td><input type="text" name="tier_9_percent" id="tier_9_percent"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" style="text-align:center;">
+                                <div class="error" id="tier_10_error">Fill in all fields</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tier 10</td>
+                            <td><input type="text" name="tier_10_discount" id="tier_10_discount"></td>
+                            <td><input type="text" name="tier_10_percent" id="tier_10_percent"></td>
+                        </tr>
+                    </table>
+                </div>
 
                 <p>You can add pictures on the next page</p>
 

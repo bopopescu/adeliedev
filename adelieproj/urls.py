@@ -15,12 +15,14 @@ urlpatterns = patterns('',
     url(r'^admin$', views.admin),
     url(r'^admin/showproduct/(?P<product_id>\d*)$', views.admin_show_product),
     url(r'^admin/showcredit/(?P<gameId>\d*)$', views.adminShowCredit),
+    url(r'^admin/givecredit/(?P<product_id>\d*)$', views.admin_give_credit),
       #AJAX CALLS
     url(r'^ajax/checkproductname/(?P<name>.*)$', views.check_product_name),
     url(r'^ajax/saveproduct$', views.admin_save_product),
     url(r'^ajax/editproduct$', views.admin_edit_product),
     url(r'^ajax/deletepic$', views.admin_delete_pic),
-    url(r'^ajax/givecredit$', views.adminGiveCredit),
+    url(r'^ajax/changetiers$', views.admin_change_tiers),
+    url(r'^ajax/givecredit$', views.admin_give_credit),
 
     ##CHECKING OUT
       #PAGES

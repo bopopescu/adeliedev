@@ -3,11 +3,12 @@ from django.shortcuts import render_to_response, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import auth
 from django.contrib.auth.models import User
-from adelieproj.models import Arrival, TrafficType, ProductArrivalType, ProductView, BillingAddress, CreditCard, ShippingAddress, Picture, Order, Credit, CartItem, Cart, Product
+from adelieproj.models import ProductTier, Arrival, TrafficType, ProductArrivalType, ProductView, BillingAddress, CreditCard, ShippingAddress, Picture, Order, Credit, CartItem, Cart, Product
 from django.template import RequestContext
 from .forms import PictureForm
 from django.utils import timezone
 from datetime import datetime, timedelta, date
+import math
 
 authorizedUsers = ["skier2k5", "admin"]
 
@@ -20,12 +21,78 @@ def admin(request):
     return redirect('/')
 
 
-def adminGiveCredit(request):
+def admin_give_credit(request, product_id = None):
     if request.user.is_authenticated():
         if request.user.username in authorizedUsers:
-            if request.method == "POST":
-                return HttpResponse("no game")
+            if request.is_ajax():
+                product_id = request.POST['product_id']
+                product = Product.objects.get(id=product_id)
+                if product.credited:
+                    return HttpResponse("Already Credited")
+                orders = product.orders.all().order_by("created_at")
+                tiers = product.tiers.all().order_by("-tier_number")
+                total_orders = len(orders)
+                all_discounted = 0
+                tier_games = []
+                tier_discounts = []
+                for tier in tiers:
+                    tier_discounts.append(tier.discount)
+                    products_discounted = math.ceil(tier.percent * total_orders / 100)
+                    if all_discounted + products_discounted > total_orders:
+                        products_discounted = total_orders - all_discounted
+                    tier_games.append(products_discounted)
+                    all_discounted += products_discounted
+                on_order = 0
+                on_tier = 0
+                next_tier = tier_games[on_tier]
+                for order in orders:
+                    credit = Credit(user=order.user, credit=tier_discounts[on_tier], tier=(10-on_tier), product=product, order=order)
+                    credit.save()
+                    on_order += 1
+                    if on_tier != 10 and on_order >= next_tier:
+                        on_tier += 1
+                        next_tier += tier_games[on_tier]
+                product.credited = True
+                product.save()
+                return HttpResponse(product.id)
+            else:
+                product = Product.objects.get(id=product_id)
+                product.order_count = len(product.orders.all())
+                return render_to_response("admingivecredit.html", RequestContext(request, {"product":product}))
     return HttpResponse("go away")
+
+
+def admin_change_tiers(request):
+    if request.user.is_authenticated():
+        if request.user.username in authorizedUsers:
+            product_id = request.POST['product_id']
+            product = Product.objects.get(id=product_id)
+            tier_discounts = request.POST.getlist('tier_discounts[]')
+            tier_percents = request.POST.getlist('tier_percents[]')
+            total_percent = 0
+            change_tiers = True
+            for x in range(0, 11):
+                discount = float(tier_discounts[x])
+                percent = float(tier_percents[x])
+                if discount == "" or percent == "":
+                    change_tiers = False
+                elif discount > product.price or discount < 0 or percent > 100 or percent < 0:
+                    change_tiers == False
+                total_percent += percent
+            if total_percent != 100:
+                change_tiers = False
+            if change_tiers:
+                for tier in product.tiers.all():
+                    tier.delete()
+                    product.tiers.remove(tier)
+                for x in range(0, 11):
+                    discount = tier_discounts[x]
+                    percent = tier_percents[x]
+                    tier = ProductTier(discount = discount, percent = percent, tier_number = x)
+                    tier.save()
+                    product.tiers.add(tier)
+            return HttpResponse("Success")
+    return HttpResponse("Fuck off")
 
 
 def adminShowCredit(request, gameId):
@@ -166,6 +233,19 @@ def admin_save_product(request):
                     saveGame = False
                 except ObjectDoesNotExist:
                     pass
+                tier_discounts = request.POST.getlist('tier_discounts[]')
+                tier_percents = request.POST.getlist('tier_percents[]')
+                total_percent = 0
+                for x in range(0, 11):
+                    discount = float(tier_discounts[x])
+                    percent = float(tier_percents[x])
+                    if discount == "" or percent == "":
+                        saveGame = False
+                    elif discount > price or discount < 0 or percent > 100 or percent < 0:
+                        saveGame == False
+                    total_percent += percent
+                if total_percent != 100:
+                    saveGame == False
                 if saveGame == True:
                     startYear = start[6:10]
                     startMonth = start[0:2]
@@ -181,6 +261,12 @@ def admin_save_product(request):
                     ship = shipYear + "-" + shipMonth + "-" + shipDay
                     product = Product(name = name, description = description, startTime = start, endTime = end, price = price, shipDate = ship, tagLine = tagline)
                     product.save()
+                    for x in range(0, 11):
+                        discount = tier_discounts[x]
+                        percent = tier_percents[x]
+                        tier = ProductTier(discount = discount, percent = percent, tier_number = x)
+                        tier.save()
+                        product.tiers.add(tier)
                     return HttpResponse(product.id)
                 else:
                     return HttpResponse("Failed")

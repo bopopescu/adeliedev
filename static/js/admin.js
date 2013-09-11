@@ -7,7 +7,7 @@ $(function() {
 });
 
 function submitGame() {
-    $(".error").css("display", "none");
+    $(".error").hide();
     name = $("#product_name").val();
     description = $("#product_desc").val();
     start = $("#product_start").val();
@@ -70,11 +70,40 @@ function submitGame() {
         $("#shipError").css("display", "inline");
         saveGame = false;
     }
+    tier_discounts = [];
+    tier_percents = [];
+    total_percent = 0;
+    var money_given_back = 0;
+    for (var i = 0; i <= 10; i++) {
+        var discount = $("#tier_" + i + "_discount").val();
+        if ((discount == "" || discount < 0) && i > 0) {
+            $("#tier_" + i + "_error").show();
+            saveGame = false;
+        }
+        var percent = $("#tier_" + i + "_percent").val();
+        if (percent == "" || percent < 0 || percent > 100) {
+            $("#tier_" + i + "_error").show();
+            saveGame = false;
+        }
+        if (i == 0) {
+            tier_discounts.push(0);
+            tier_percents.push(percent);
+        }
+        else {
+            tier_discounts.push(discount);
+            tier_percents.push(percent);
+        }
+        total_percent += parseFloat(percent);
+    }
+    if (total_percent != 100) {
+        $("#total_percent_error").show();
+        saveGame = false;
+    }
 
     if (saveGame) {
         $.ajax({
             url: '/ajax/saveproduct',
-            data: {name: name, desc: description, start: start, startTime: startTime, end: end, endTime: endTime, price: price, ship:ship, tagline:tagline},
+            data: {tier_percents: tier_percents, tier_discounts: tier_discounts, name: name, desc: description, start: start, startTime: startTime, end: end, endTime: endTime, price: price, ship:ship, tagline:tagline},
             type: "POST",
             async: false,
             success: function (response) {
